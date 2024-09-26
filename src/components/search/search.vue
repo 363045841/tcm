@@ -23,15 +23,28 @@
               @blur="move = false"
             >
               <template #append-inner>
-                <span class="material-symbols-outlined" style="padding: 16px">
-                  image
-                </span>
-                <span
-                  class="material-symbols-outlined"
-                  @click="console.log(123)"
-                >
-                  search
-                </span>
+                <v-tooltip text="搜图" location="bottom">
+                  <template #activator="{ props }">
+                    <img
+                      v-bind="props"
+                      class="icon"
+                      src="../../assets/icon/carmera.svg"
+                      alt="search photo"
+                      style="height: 24px !important; margin:16px"
+                    />
+                  </template>
+                </v-tooltip>
+                <v-tooltip text="搜索" location="bottom">
+                  <template #activator="{ props }">
+                    <img
+                      v-bind="props"
+                      class="icon"
+                      src="../../assets/icon/search.svg"
+                      alt="search"
+                      style="height: 24px; margin-right: 8px;"
+                    />
+                  </template>
+                </v-tooltip>
               </template>
             </v-text-field>
           </transition>
@@ -50,7 +63,7 @@ let move = ref<boolean>(false);
 </script>
 
 <style scoped>
-.material-symbols-outlined:hover {
+.icon:hover {
 }
 
 .fade-enter-active,

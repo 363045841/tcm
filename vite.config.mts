@@ -70,5 +70,9 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-  }
+  },
+  base: '/index/',
+  build: {
+    outDir: 'C:\\Users\\3630\\Desktop\\dist',
+  },
 })
