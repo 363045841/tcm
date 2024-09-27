@@ -1,26 +1,18 @@
 <template>
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-  />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-  />
   <v-container>
     <v-row>
-      <v-col cols="8" style="margin: auto">
-        <div :class="{ moving: move }" class="movable">
+      <v-col cols="8" style="margin: auto; padding: 0px">
+        <div :class="{ moving: move }" class="movable" style="padding: 0px">
           <transition name="fade" mode="out-in">
             <v-text-field
               v-if="showStore.searchShow"
               variant="outlined"
-              append-icon="md:search"
               label="搜索"
               rounded
               v-model:model-value="searchText"
-              @focus="move = true"
-              @blur="move = false"
+              :hide-details="true"
+              @focus="(move = true), (showStore.searchFocus = true)"
+              @blur="(move = false), (showStore.searchFocus = false)"
             >
               <template #append-inner>
                 <v-tooltip text="搜图" location="bottom">
@@ -30,7 +22,7 @@
                       class="icon"
                       src="../../assets/icon/carmera.svg"
                       alt="search photo"
-                      style="height: 24px !important; margin:16px"
+                      style="height: 24px !important; margin: 16px"
                     />
                   </template>
                 </v-tooltip>
@@ -41,7 +33,7 @@
                       class="icon"
                       src="../../assets/icon/search.svg"
                       alt="search"
-                      style="height: 24px; margin-right: 8px;"
+                      style="height: 24px; margin-right: 8px"
                     />
                   </template>
                 </v-tooltip>
@@ -51,15 +43,68 @@
         </div>
       </v-col>
     </v-row>
+    <v-row justify="center">
+      <v-col cols="8" style="margin: auto; padding: 0px">
+        <search-ans v-if="showStore.searchFocus" :searchText="searchText"/>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
+import searchAns from "./searchAns.vue";
 const showStore = useComponentsShowStore();
 let searchText = ref<string | null>(null);
 let move = ref<boolean>(false);
+
+const items = [
+  {
+    prependIcon: "mdi-clock-outline",
+    title: "recipe with chicken",
+  },
+  {
+    prependIcon: "mdi-clock-outline",
+    title: "best hiking trails near me",
+  },
+  {
+    prependIcon: "mdi-clock-outline",
+    title: "how to learn a new language",
+  },
+  {
+    prependIcon: "mdi-clock-outline",
+    title: "DIY home organization ideas",
+  },
+  {
+    prependIcon: "mdi-clock-outline",
+    title: "latest fashion trends",
+  },
+];
+const shortcuts = [
+  {
+    icon: "mdi-github",
+    title: "Master ",
+    href: "https://github.com/vuetifyjs/vuetify",
+  },
+  {
+    icon: "mdi-github",
+    title: "Dev",
+    href: "https://github.com/vuetifyjs/vuetify/tree/dev",
+  },
+  {
+    icon: "mdi-github",
+    title: "Stable",
+    href: "https://github.com/vuetifyjs/vuetify/tree/v2-stable",
+  },
+  {
+    icon: "mdi-github",
+    title: "My Pull Requests",
+    href: "https://github.com/vuetifyjs/vuetify/pulls/johnleider",
+  },
+];
+
+const dialog = ref(false);
 </script>
 
 <style scoped>
@@ -84,6 +129,6 @@ let move = ref<boolean>(false);
 }
 
 .moving {
-  transform: translateY(-25vh); /* 向上移动50px */
+  transform: translateY(-5px); /* 向上移动50px */
 }
 </style>
