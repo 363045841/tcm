@@ -56,7 +56,7 @@ import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./searchAns.vue";
 const showStore = useComponentsShowStore();
-let searchText = ref<string | null>(null);
+let searchText = ref<string>("");
 let move = ref<boolean>(false);
 
 const items = [
