@@ -11,8 +11,8 @@ export interface TitleInfo {
 
 interface Item {
   title: TitleInfo[];
-  strongTitle: Map<number, [number, number]>; 
-  strongSubTitle: Map<number, [number, number]>; 
+  strongTitle: Map<number, [number, number]>;
+  strongSubTitle: Map<number, [number, number]>;
 }
 
 export const useComponentsSearchItemStore = defineStore('searchItem', {
@@ -64,7 +64,7 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
           }
         }
       }
-      console.log(1, toRaw(Array.from(this.strongTitle.entries())));
+      //console.log(1, toRaw(Array.from(this.strongTitle.entries())));
     }
   }
 });
