@@ -9,7 +9,7 @@
         <v-app-bar-title>我超,中医药</v-app-bar-title>
       </v-app-bar>
 
-      <v-container height="100vh">
+      <v-container class="all-container" height="100%">
         <v-row align="center" justify="center" style="height: 90%">
           <v-col>
             <search class=""></search>
