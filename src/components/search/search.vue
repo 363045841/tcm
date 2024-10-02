@@ -45,7 +45,7 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="8" style="margin: auto; padding: 0px">
-        <search-ans v-if="showStore.searchFocus" :searchText="searchText"/>
+        <search-ans v-if="showStore.searchFocus" :searchText="searchText" />
       </v-col>
     </v-row>
   </v-container>
@@ -129,6 +129,6 @@ const dialog = ref(false);
 }
 
 .moving {
-  transform: translateY(-5px); /* 向上移动50px */
+  /* transform: translateY(-5px); */ /* 向上移动50px */
 }
 </style>

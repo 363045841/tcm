@@ -1,18 +1,51 @@
 <template>
   <v-list lines="two" class="search-list" rounded elevation="1">
     <v-list-item
-      v-for="(n, key) in filteredItems"
-      :key="key"
-      :title="n.title"
-      :subtitle="n.subtitle"
-      :prepend-avatar="n.avatar"
+      v-for="(item, index) in filteredItems"
+      :key="index"
+      :subtitle="item.subtitle"
+      :prepend-avatar="item.avatar"
     >
+      <template #title>
+        {{ console.log("ans", item) }}
+        <span>
+          {{
+            item.title.substring(
+              0,
+              dataStore.strongTitle.get(item.id)?.[0] ?? 0
+            )
+          }}
+        </span>
+        <span
+          ><b>{{
+            item.title.substring(
+              dataStore.strongTitle.get(item.id)?.[0] ?? 0,
+              dataStore.strongTitle.get(item.id)?.[1] ?? 0
+            )
+          }}</b></span
+        >
+        <span>{{
+          item.title.substring(dataStore.strongTitle.get(item.id)?.[1] ?? 0)
+        }}</span>
+      </template>
+      <template #subtitle>
+        <span>
+          {{ item.subtitle.substring(0, dataStore.strongSubTitle.get(item.id)?.[0] ?? 0) }}
+        </span>
+        <span><b>{{ item.subtitle.substring(dataStore.strongSubTitle.get(item.id)?.[0] ?? 0, dataStore.strongSubTitle.get(item.id)?.[1] ?? 0) }}</b></span>
+        <span>{{ item.subtitle.substring(dataStore.strongSubTitle.get(item.id)?.[1] ?? 0) }}</span>
+      </template>
     </v-list-item>
   </v-list>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive } from "vue";
+import { ref, watch } from "vue";
+import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
+import { type TitleInfo } from "@/stores/searchPage/searchItem";
+
+const dataStore = useComponentsSearchItemStore();
+
 const props = defineProps({
   searchText: {
     type: String,
@@ -20,31 +53,7 @@ const props = defineProps({
   },
 });
 
-interface Item {
-  title: string;
-  subtitle: string;
-  avatar: string;
-}
-
-const items: Array<Item> = [
-  {
-    title: "肾虚",
-    subtitle: "shenxu",
-    avatar: "https://randomuser.me/api/portraits/women/8.jpg",
-  },
-  {
-    title: "肾虚了吗",
-    subtitle: "shenbuxu",
-    avatar: "https://randomuser.me/api/portraits/women/8.jpg",
-  },
-  {
-    title: "枸杞",
-    subtitle: "jiushishenxu",
-    avatar: "https://randomuser.me/api/portraits/women/8.jpg",
-  },
-];
-
-const filteredItems = ref<Array<Item>>([]);
+const filteredItems = ref<Array<TitleInfo>>([]);
 
 // 监听 searchText 的变化
 watch(
@@ -52,13 +61,16 @@ watch(
   (val) => {
     if (val) {
       // 根据输入内容过滤出匹配项
-      filteredItems.value = items.filter(
-        (item) => item.title.includes(val) || item.subtitle.includes(val)
-      );
+      if (Array.isArray(dataStore.title) && dataStore.title !== null) {
+        filteredItems.value = dataStore.title.filter(
+          (item) => item.title.includes(val) || item.subtitle.includes(val)
+        );
+      }
     } else {
       // 如果没有输入内容，则显示所有项
-      filteredItems.value = items;
+      filteredItems.value = dataStore.title;
     }
+    dataStore.computeStrongRange(val);
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
