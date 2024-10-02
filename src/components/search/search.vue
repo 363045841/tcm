@@ -13,6 +13,9 @@
               :hide-details="true"
               @focus="(move = true), (showStore.searchFocus = true)"
               @blur="(move = false), (showStore.searchFocus = false)"
+              @input="onInput"
+              @compositionstart="isComposing = true"
+              @compositionend="onCompositionEnd"
             >
               <template #append-inner>
                 <v-tooltip text="搜图" location="bottom">
@@ -45,66 +48,37 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="8" style="margin: auto; padding: 0px">
-        <search-ans v-if="showStore.searchFocus" :searchText="searchText" />
+        <search-ans
+          v-if="showStore.searchFocus"
+          :searchText="finalizedSearchText"
+        />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./searchAns.vue";
+
 const showStore = useComponentsShowStore();
-let searchText = ref<string>("");
+let searchText = ref<string>(""); // 用户输入的搜索内容
 let move = ref<boolean>(false);
+let isComposing = ref<boolean>(false); // 用于跟踪输入法状态
+let finalizedSearchText = ref<string>(""); // 最终传递给子组件的搜索内容
 
-const items = [
-  {
-    prependIcon: "mdi-clock-outline",
-    title: "recipe with chicken",
-  },
-  {
-    prependIcon: "mdi-clock-outline",
-    title: "best hiking trails near me",
-  },
-  {
-    prependIcon: "mdi-clock-outline",
-    title: "how to learn a new language",
-  },
-  {
-    prependIcon: "mdi-clock-outline",
-    title: "DIY home organization ideas",
-  },
-  {
-    prependIcon: "mdi-clock-outline",
-    title: "latest fashion trends",
-  },
-];
-const shortcuts = [
-  {
-    icon: "mdi-github",
-    title: "Master ",
-    href: "https://github.com/vuetifyjs/vuetify",
-  },
-  {
-    icon: "mdi-github",
-    title: "Dev",
-    href: "https://github.com/vuetifyjs/vuetify/tree/dev",
-  },
-  {
-    icon: "mdi-github",
-    title: "Stable",
-    href: "https://github.com/vuetifyjs/vuetify/tree/v2-stable",
-  },
-  {
-    icon: "mdi-github",
-    title: "My Pull Requests",
-    href: "https://github.com/vuetifyjs/vuetify/pulls/johnleider",
-  },
-];
-
-const dialog = ref(false);
+const onInput = (event: Event) => {
+  if (!isComposing.value) {
+    searchText.value = (event.target as HTMLInputElement).value;
+    console.log("search text", searchText.value);
+  }
+};
+const onCompositionEnd = (event: CompositionEvent) => {
+  isComposing.value = false;
+  searchText.value = (event.target as HTMLInputElement).value;
+  finalizedSearchText.value = searchText.value;
+};
 </script>
 
 <style scoped>

@@ -59,6 +59,7 @@ const filteredItems = ref<Array<TitleInfo>>([]);
 watch(
   () => props.searchText,
   (val) => {
+    console.log("watch", val);
     if (val) {
       // 根据输入内容过滤出匹配项
       if (Array.isArray(dataStore.title) && dataStore.title !== null) {
