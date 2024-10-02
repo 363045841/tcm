@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./searchAns.vue";
 
@@ -71,6 +71,7 @@ let finalizedSearchText = ref<string>(""); // 最终传递给子组件的搜索�
 const onInput = (event: Event) => {
   if (!isComposing.value) {
     searchText.value = (event.target as HTMLInputElement).value;
+    finalizedSearchText.value = searchText.value;
     console.log("search text", searchText.value);
   }
 };
