@@ -1,7 +1,15 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="8" style="margin: auto; padding: 0px">
+      <v-col
+        sm="8"
+        md="8"
+        xs="10"
+        lg="10"
+        xl="10"
+        style="margin: auto; padding: 0px"
+        class="test"
+      >
         <div :class="{ moving: move }" class="movable" style="padding: 0px">
           <transition name="fade" mode="out-in">
             <v-text-field
@@ -47,7 +55,14 @@
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="8" style="margin: auto; padding: 0px">
+      <v-col
+        sm="8"
+        md="8"
+        xs="10"
+        lg="10"
+        xl="10"
+        style="margin: auto; padding: 0px"
+      >
         <search-ans
           v-if="showStore.searchFocus"
           :searchText="finalizedSearchText"
@@ -61,13 +76,25 @@
 import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./searchAns.vue";
+import { useViewPortStore } from "@/stores/viewportState";
+import { useDisplay } from "vuetify";
+
+// 响应式状态处理
+const viewportStore = useViewPortStore();
+viewportStore.setViewportState();
+onMounted(() => {
+  viewportStore.updateAttr();
+  console.log(viewportStore.getViewportState);
+  console.log(useDisplay().name.value);
+});
 
 const showStore = useComponentsShowStore();
 let searchText = ref<string>(""); // 用户输入的搜索内容
-let move = ref<boolean>(false);
+let move = ref<boolean>(false); // 用于控制搜索框的移动
+
+// 监视输入法状态控制输入props
 let isComposing = ref<boolean>(false); // 用于跟踪输入法状态
 let finalizedSearchText = ref<string>(""); // 最终传递给子组件的搜索内容
-
 const onInput = (event: Event) => {
   if (!isComposing.value) {
     searchText.value = (event.target as HTMLInputElement).value;
