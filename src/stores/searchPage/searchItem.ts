@@ -1,6 +1,6 @@
 // Utilities
 import { defineStore } from 'pinia';
-import { toRaw } from 'vue';
+
 
 export interface TitleInfo {
   id: number;
@@ -22,7 +22,7 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
         id: 0,
         title: "肾虚",
         subtitle: "shenxu",
-        avatar: "https://randomuser.me/api/portraits/women/8.jpg",
+        avatar: "https://randomuser.me/api/portraits/women/7.jpg",
       },
       {
         id: 1,
@@ -34,7 +34,19 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
         id: 2,
         title: "枸杞",
         subtitle: "jiushishenxu",
-        avatar: "https://randomuser.me/api/portraits/women/8.jpg",
+        avatar: "https://randomuser.me/api/portraits/women/6.jpg",
+      },
+      {
+        id: 3,
+        title: "枸杞",
+        subtitle: "jiushishenxu",
+        avatar: "https://randomuser.me/api/portraits/women/5.jpg",
+      },
+      {
+        id: 4,
+        title: "枸杞",
+        subtitle: "jiushishenxu",
+        avatar: "https://randomuser.me/api/portraits/women/3.jpg",
       },
     ],
     strongTitle: new Map<number, [number, number]>(),
