@@ -7,10 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Loading: typeof import('./components/search/loading.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Search: typeof import('./components/search/search.vue')['default']
-    Searchans: typeof import('./components/search/searchans.vue')['default']
     SearchAns: typeof import('./components/search/searchAns.vue')['default']
   }
 }

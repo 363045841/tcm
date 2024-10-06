@@ -1,0 +1,25 @@
+<template>
+  <v-list
+    lines="two"
+    class="search-list"
+    rounded
+    elevation="1"
+    height="250px"
+    style="display: flex; justify-content: center; align-items: center; border-radius: 16px;"
+  >
+    <v-progress-linear
+      :model-value="loadrate"
+      rounded
+      indeterminate
+      style="width: 10%"
+    ></v-progress-linear>
+  </v-list>
+</template>
+
+<script setup lang="ts" name="">
+import { ref } from "vue";
+let loading = ref<boolean>(true);
+let loadrate = ref<number>(20);
+</script>
+
+<style scoped></style>

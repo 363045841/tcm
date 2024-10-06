@@ -1,7 +1,12 @@
 <template>
-  <v-list lines="two" class="search-list" rounded elevation="1">
+  <v-list
+    v-if="loadingAttr == false"
+    lines="two"
+    class="search-list"
+    rounded
+    elevation="1"
+  >
     <v-list-item
-      v-if="loadrate === 100"
       v-for="(item, index) in filteredItems"
       :key="index"
       :subtitle="item.subtitle"
@@ -53,41 +58,18 @@
         }}</span>
       </template>
     </v-list-item>
-    <!-- 后面用插槽实现,在search组件上控制加载进度 -->
-    <v-progress-linear
-      v-if="loadrate > 0 && loadrate < 100"
-      :model-value="loadrate"
-      rounded
-      style="width: 95%; margin: auto"
-    ></v-progress-linear>
   </v-list>
+  <!-- 后面用插槽实现,在search组件上控制加载进度 -->
+  <loading v-if="loadingAttr"></loading>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
+import loading from "./loading.vue";
 
 const dataStore = useComponentsSearchItemStore();
-let increment = 20;
-// DEMO 模拟搜索加载时间
-let loadrate = ref<number>(0);
-const loadInterval = setInterval(() => {
-  if (loadrate.value < 100) {
-    // 随着loadrate.value的增加，increment逐渐减小
-    increment = Math.max(1, increment - 0.2 * increment); // 调整衰减速度
-    loadrate.value += increment;
-
-    // 确保loadrate.value不会超过100
-    if (loadrate.value > 100) {
-      loadrate.value = 100;
-      clearInterval(loadInterval);
-    }
-  } else {
-    clearInterval(loadInterval);
-  }
-}, 100);
-
 const props = defineProps({
   searchText: {
     type: String,
@@ -95,13 +77,19 @@ const props = defineProps({
   },
 });
 
+// DEMO 模拟搜索加载时间
+let loadingAttr = ref(true);
+setTimeout(() => {
+  loadingAttr.value = false;
+}, 1000);
+
 const filteredItems = ref<Array<TitleInfo>>([]);
 
 // 监听 searchText 的变化
 watch(
   () => props.searchText,
   (val) => {
-    console.log("watch", val);
+    loadingAttr.value = true;
     if (val) {
       // 根据输入内容过滤出匹配项
       if (Array.isArray(dataStore.title) && dataStore.title !== null) {
@@ -114,6 +102,9 @@ watch(
       filteredItems.value = dataStore.title;
     }
     dataStore.computeStrongRange(val);
+    setTimeout(() => {
+      loadingAttr.value = false;
+    }, 1000);
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
@@ -122,5 +113,9 @@ watch(
 <style scoped>
 .search-list {
   border-radius: 16px;
+}
+
+.loading {
+  height: 25vh;
 }
 </style>
