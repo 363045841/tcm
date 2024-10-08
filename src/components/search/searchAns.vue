@@ -68,6 +68,7 @@ import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
 import loading from "./loading.vue";
+import { fi } from "vuetify/locale";
 
 const dataStore = useComponentsSearchItemStore();
 const props = defineProps({
@@ -81,7 +82,7 @@ const props = defineProps({
 let loadingAttr = ref(true);
 setTimeout(() => {
   loadingAttr.value = false;
-}, 1000);
+}, 500);
 
 const filteredItems = ref<Array<TitleInfo>>([]);
 
@@ -99,7 +100,11 @@ watch(
       }
     } else {
       // 如果没有输入内容，则显示所有项
-      filteredItems.value = dataStore.title;
+      /* filteredItems.value = dataStore.title; */
+      filteredItems.value = dataStore.emptytitle;
+    }
+    if(filteredItems.value.length === 0){
+      filteredItems.value = dataStore.emptytitle;
     }
     dataStore.computeStrongRange(val);
     setTimeout(() => {

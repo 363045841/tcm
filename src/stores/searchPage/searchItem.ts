@@ -11,6 +11,7 @@ export interface TitleInfo {
 
 interface Item {
   title: TitleInfo[];
+  emptytitle: TitleInfo[];
   strongTitle: Map<number, [number, number]>;
   strongSubTitle: Map<number, [number, number]>;
 }
@@ -49,6 +50,12 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
         avatar: "https://randomuser.me/api/portraits/women/3.jpg",
       },
     ],
+    emptytitle: [{
+      id: 0,
+      title: "没有搜索到相关内容",
+      subtitle: "",
+      avatar: ""
+    }],
     strongTitle: new Map<number, [number, number]>(),
     strongSubTitle: new Map<number, [number, number]>(),
   }),
