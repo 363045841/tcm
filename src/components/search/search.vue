@@ -64,7 +64,7 @@
         style="margin: auto; padding: 0px"
       >
         <search-ans
-          v-if="showStore.searchShow"
+          v-if="showStore.searchShow && move"
           :searchText="finalizedSearchText"
         />
       </v-col>

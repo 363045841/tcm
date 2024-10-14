@@ -2,10 +2,9 @@
   "name": "tcm",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build --emptyOutDir",
-    "preview": "vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore"
+    "serve": "vue-cli-service serve", 
+    "dev": "vite", 
+    "build": "vue-cli-service build" 
   },
   "dependencies": {
     "@mdi/font": "7.4.47",

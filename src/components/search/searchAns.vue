@@ -13,7 +13,6 @@
       :prepend-avatar="item.avatar"
     >
       <template #title>
-        {{ console.log("ans", item) }}
         <span>
           {{
             item.title.substring(
@@ -68,7 +67,6 @@ import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
 import loading from "./loading.vue";
-import { fi } from "vuetify/locale";
 
 const dataStore = useComponentsSearchItemStore();
 const props = defineProps({
