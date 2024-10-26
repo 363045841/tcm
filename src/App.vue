@@ -12,7 +12,7 @@
       <v-container class="all-container" height="100%">
         <v-row align="center" justify="center" style="height: 90%">
           <v-col>
-            <search class=""></search>
+            <search :style="{width: $vuetify.display.xs ? '90%' : '65%'}"></search>
           </v-col>
         </v-row>
       </v-container>
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import search from "./components/search/search.vue";
+import search from "./components/search/search-main.vue";
 import { useComponentsShowStore } from "./stores/searchPage/componentsShow";
 const showStore = useComponentsShowStore();
 setTimeout(() => {

@@ -66,7 +66,7 @@
 import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
-import loading from "./loading.vue";
+import loading from "./search-loading.vue";
 
 const dataStore = useComponentsSearchItemStore();
 const props = defineProps({
