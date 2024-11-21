@@ -84,6 +84,7 @@ setTimeout(() => {
 
 const filteredItems = ref<Array<TitleInfo>>([]);
 
+
 // 监听 searchText 的变化
 watch(
   () => props.searchText,
@@ -94,7 +95,8 @@ watch(
     loadingAttr.value = true;
 
       // 根据输入内容过滤出匹配项
-    let templist = toRaw(dataStore.title).title;
+    let templistToRaw = toRaw(dataStore.title) as unknown as {title: TitleInfo[]};
+    let templist = templistToRaw.title;
     if (Array.isArray(templist) && templist.length > 0) {
       filteredItems.value = templist.filter((item) => {
         return (
