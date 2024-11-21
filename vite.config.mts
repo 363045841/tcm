@@ -10,6 +10,10 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+import { configDotenv } from 'dotenv'
+
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -71,8 +75,8 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  base: '/tcmpre/',
+ /*  base: '/tcmpre/', */
   build: {
-    outDir: 'C:\\Users\\3630\\Desktop\\dist',
+    outDir: process.env.VITE_OUT_PATH,
   },
 })

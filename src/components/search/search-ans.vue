@@ -87,23 +87,26 @@ const filteredItems = ref<Array<TitleInfo>>([]);
 // 监听 searchText 的变化
 watch(
   () => props.searchText,
-  (val) => {
+  async (val) => {
+    dataStore.title = await getAnsJSON(val);// 现在是模拟，到时候还得带上参数
+    console.log("val", val);
+    console.log("update dataStore.title", dataStore.title);
     loadingAttr.value = true;
-    if (val) {
+
       // 根据输入内容过滤出匹配项
-      if (Array.isArray(dataStore.title) && dataStore.title !== null) {
-        filteredItems.value = dataStore.title.filter(
-          (item) => item.title.includes(val) || item.subtitle.includes(val)
+    let templist = toRaw(dataStore.title).title;
+    if (Array.isArray(templist) && templist.length > 0) {
+      filteredItems.value = templist.filter((item) => {
+        return (
+          item.title.includes(val) || item.subtitle.includes(val)
         );
-      }
-    } else {
-      // 如果没有输入内容，则显示所有项
-      /* filteredItems.value = dataStore.title; */
+      });
+    }
+    if(filteredItems.value.length == 0) {
       filteredItems.value = dataStore.emptytitle;
     }
-    if(filteredItems.value.length === 0){
-      filteredItems.value = dataStore.emptytitle;
-    }
+      
+    console.log("filteredItems", filteredItems.value);
     dataStore.computeStrongRange(val);
     setTimeout(() => {
       loadingAttr.value = false;
@@ -111,6 +114,21 @@ watch(
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
+
+async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
+  let backupUrl: string = "http://" + import.meta.env.VITE_IP + ":" + import.meta.env.VITE_BACKEND_PORT;
+  try {
+    const response = await fetch(backupUrl + "/json");
+    const data: TitleInfo[] = await response.json(); // 假设服务器返回的是一个 TitleInfo 数组
+    console.log("loaded", data);
+    return data; // 返回解析后的数据
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return dataStore.emptytitle; // 发生错误时返回空标题数组
+  }
+}
+
+
 </script>
 
 <style scoped>

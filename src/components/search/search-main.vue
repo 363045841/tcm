@@ -114,11 +114,11 @@ let searchPrefer = ref<string>("全部");
 watch(searchPrefer, () => {
   console.log("search prefer", searchPrefer.value);
 });
+
+
 </script>
 
 <style scoped>
-.icon:hover {
-}
 
 .fade-enter-active,
 .fade-leave-active {
