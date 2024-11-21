@@ -89,18 +89,13 @@ const filteredItems = ref<Array<TitleInfo>>([]);
 watch(
   () => props.searchText,
   async (val) => {
-    dataStore.title = await getAnsJSON(val);// 现在是模拟，到时候还得带上参数
+    let templist:TitleInfo[] = await getAnsJSON(val);
+    dataStore.title = templist;// 现在是模拟，到时候还得带上参数
     console.log("val", val);
     console.log("update dataStore.title", dataStore.title);
     loadingAttr.value = true;
 
       // 根据输入内容过滤出匹配项
-    let templistToRaw = toRaw(dataStore.title) as unknown as {title: TitleInfo[]} | null;
-    let templist: TitleInfo[] = [];
-    if(templistToRaw != null){
-      templist = templistToRaw.title;
-    }
-    templistToRaw = null;
     if (Array.isArray(templist) && templist.length > 0) {
       filteredItems.value = templist.filter((item) => {
         return (
@@ -125,9 +120,9 @@ async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
   let backupUrl: string = "http://" + import.meta.env.VITE_IP + ":" + import.meta.env.VITE_BACKEND_PORT;
   try {
     const response = await fetch(backupUrl + "/json");
-    const data: TitleInfo[] = await response.json(); // 假设服务器返回的是一个 TitleInfo 数组
+    const data = await response.json(); // 假设服务器返回的是一个 TitleInfo 数组
     console.log("loaded", data);
-    return data; // 返回解析后的数据
+    return data.title; // 返回解析后的数据
   } catch (error) {
     console.error("Error fetching data:", error);
     return dataStore.emptytitle; // 发生错误时返回空标题数组
