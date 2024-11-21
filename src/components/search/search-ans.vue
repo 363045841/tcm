@@ -95,8 +95,12 @@ watch(
     loadingAttr.value = true;
 
       // 根据输入内容过滤出匹配项
-    let templistToRaw = toRaw(dataStore.title) as unknown as {title: TitleInfo[]};
-    let templist = templistToRaw.title;
+    let templistToRaw = toRaw(dataStore.title) as unknown as {title: TitleInfo[]} | null;
+    let templist: TitleInfo[] = [];
+    if(templistToRaw != null){
+      templist = templistToRaw.title;
+    }
+    templistToRaw = null;
     if (Array.isArray(templist) && templist.length > 0) {
       filteredItems.value = templist.filter((item) => {
         return (
