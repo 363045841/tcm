@@ -89,12 +89,12 @@ const filteredItems = ref<Array<TitleInfo>>([]);
 watch(
   () => props.searchText,
   async (val) => {
+    loadingAttr.value = true;
     let templist:TitleInfo[] = await getAnsJSON(val);
     dataStore.title = templist;// 现在是模拟，到时候还得带上参数
     console.log("val", val);
     console.log("update dataStore.title", dataStore.title);
-    loadingAttr.value = true;
-
+    
       // 根据输入内容过滤出匹配项
     if (Array.isArray(templist) && templist.length > 0) {
       filteredItems.value = templist.filter((item) => {
@@ -102,6 +102,8 @@ watch(
           item.title.includes(val) || item.subtitle.includes(val)
         );
       });
+    } else {
+      filteredItems.value = dataStore.emptytitle;
     }
     if(filteredItems.value.length == 0) {
       filteredItems.value = dataStore.emptytitle;
@@ -109,9 +111,10 @@ watch(
       
     console.log("filteredItems", filteredItems.value);
     dataStore.computeStrongRange(val);
+    loadingAttr.value = false;
     setTimeout(() => {
-      loadingAttr.value = false;
-    }, 1000);
+      
+    }, 500);
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
@@ -128,7 +131,6 @@ async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
     return dataStore.emptytitle; // 发生错误时返回空标题数组
   }
 }
-
 
 </script>
 
