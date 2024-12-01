@@ -8,15 +8,7 @@
 
         <v-app-bar-title>我超,中医药</v-app-bar-title>
       </v-app-bar>
-
-      <v-container class="all-container" height="100%">
-        <v-row align="center" justify="center" style="height: 90%">
-          <v-col>
-            <search :style="{width: $vuetify.display.xs ? '90%' : '65%'}"></search>
-          </v-col>
-        </v-row>
-      </v-container>
-      <!-- <router-view /> -->
+      <router-view />
     </v-main>
   </v-app>
 </template>
