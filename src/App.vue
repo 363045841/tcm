@@ -8,13 +8,12 @@
 
         <v-app-bar-title>我超,中医药</v-app-bar-title>
       </v-app-bar>
-      <router-view />
+      <router-view class="router-view"></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts" setup>
-import search from "./components/search/search-main.vue";
 import { useComponentsShowStore } from "./stores/searchPage/componentsShow";
 const showStore = useComponentsShowStore();
 setTimeout(() => {
@@ -22,4 +21,10 @@ setTimeout(() => {
 }, 100);
 </script>
 
-<style></style>
+<style scoped>
+.router-view {
+  overflow-y: auto; /* 超出时显示垂直滚动条 */
+  overflow-y: hidden;
+  height: calc(100vh - 64px) !important;
+}
+</style>
