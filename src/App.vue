@@ -23,8 +23,8 @@ setTimeout(() => {
 
 <style scoped>
 .router-view {
-  overflow-y: auto; /* 超出时显示垂直滚动条 */
-  overflow-y: hidden;
+  
   height: calc(100vh - 64px) !important;
 }
+
 </style>
