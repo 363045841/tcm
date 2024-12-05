@@ -104,6 +104,7 @@ const onInput = (event: Event) => {
     console.log("search text", searchText.value);
   }
 };
+
 const onCompositionEnd = (event: CompositionEvent) => {
   isComposing.value = false;
   searchText.value = (event.target as HTMLInputElement).value;
@@ -111,9 +112,9 @@ const onCompositionEnd = (event: CompositionEvent) => {
 };
 
 let searchPrefer = ref<string>("全部");
-watch(searchPrefer, () => {
+/* watch(searchPrefer, () => {
   console.log("search prefer", searchPrefer.value);
-});
+}); */
 
 
 </script>

@@ -10,6 +10,7 @@
     "@mdi/font": "7.4.47",
     "core-js": "^3.39.0",
     "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
     "material-design-icons-iconfont": "^6.7.0",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.5.13",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@babel/types": "^7.26.0",
+    "@types/lodash": "^4.17.13",
     "@types/node": "^20.17.6",
     "@vitejs/plugin-vue": "^5.2.0",
     "@vue/eslint-config-typescript": "^13.0.0",

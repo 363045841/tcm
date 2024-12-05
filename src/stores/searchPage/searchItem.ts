@@ -1,7 +1,6 @@
 // Utilities
 import { defineStore } from 'pinia';
 
-
 export interface TitleInfo {
   id: number;
   title: string;
@@ -12,6 +11,7 @@ export interface TitleInfo {
 export interface Item {
   title: TitleInfo[];
   emptytitle: TitleInfo[];
+  historyAlertTitle: TitleInfo[];
   strongTitle: Map<number, [number, number]>;
   strongSubTitle: Map<number, [number, number]>;
 }
@@ -27,6 +27,12 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
     emptytitle: [{
       id: 0,
       title: "没有搜索到相关内容",
+      subtitle: "",
+      avatar: ""
+    }],
+    historyAlertTitle: [{
+      id: 0,
+      title: "这是历史记录，但我并没有做这个功能，略略略",
       subtitle: "",
       avatar: ""
     }],

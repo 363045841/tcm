@@ -27,12 +27,7 @@ import { useViewPortStore } from "@/stores/viewportState";
 
 const viewportState = useViewPortStore();
 let loadWidth = viewportState.isMobile ? { width: "50%" } : { width: "10%" };
-watch(
-  () => viewportState.isMobile,
-  () => {
-    loadWidth = viewportState.isMobile ? { width: "50%" } : { width: "10%" };
-  }
-);
+
 
 let loadrate = ref<number>(20);
 </script>

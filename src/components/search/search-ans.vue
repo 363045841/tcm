@@ -86,16 +86,24 @@ const filteredItems = ref<Array<TitleInfo>>([]);
 
 
 // 监听 searchText 的变化
-watch(
-  () => props.searchText,
-  async (val) => {
+
+import { debounce } from 'lodash';
+
+let isFirstSearch: boolean = true;
+// 将函数逻辑封装为一个防抖处理的函数
+const debouncedWatchHandler = debounce(
+  async (val: string) => {
+    
     loadingAttr.value = true;
-    let templist:TitleInfo[] = await getAnsJSON(val);
-    dataStore.title = templist;// 现在是模拟，到时候还得带上参数
+    setTimeout(() => {
+      loadingAttr.value = false;
+    }, 500);
+    let templist: TitleInfo[] = await getAnsJSON(val); // 阻塞等待后端返回数据
+    dataStore.title = templist; // 模拟，后续带参数调用
     console.log("val", val);
     console.log("update dataStore.title", dataStore.title);
-    
-      // 根据输入内容过滤出匹配项
+
+    // 根据输入内容过滤出匹配项
     if (Array.isArray(templist) && templist.length > 0) {
       filteredItems.value = templist.filter((item) => {
         return (
@@ -105,19 +113,31 @@ watch(
     } else {
       filteredItems.value = dataStore.emptytitle;
     }
-    if(filteredItems.value.length == 0) {
+
+    if (filteredItems.value.length === 0) {
       filteredItems.value = dataStore.emptytitle;
     }
-      
+
     console.log("filteredItems", filteredItems.value);
     dataStore.computeStrongRange(val);
-    loadingAttr.value = false;
-    setTimeout(() => {
-      
-    }, 500);
+  },
+  500 // 防抖延时
+);
+
+watch(
+  () => props.searchText,
+  (val) => {
+    if(isFirstSearch) {
+      isFirstSearch = false;
+      //展示初始值(like 历史记录)
+      filteredItems.value = dataStore.historyAlertTitle;
+    }else{
+      debouncedWatchHandler(val); // 调用防抖函数
+    }
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
+
 
 async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
   let backupUrl: string = "http://" + import.meta.env.VITE_IP + ":" + import.meta.env.VITE_BACKEND_PORT;
