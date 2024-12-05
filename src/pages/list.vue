@@ -1,42 +1,45 @@
 <template>
     <v-container class="pa-4">
-      <v-row>
-        <v-col
-          v-for="(card, index) in list"
-          :key="index"
-          cols="12"
-          sm="6"
-          md="3"
-          lg="2"
-        >
-          <v-card>
-            <v-img
-              style="margin: auto;"
-              :src="card.picurl"
-              alt="Card Image"
-              aspect-ratio="16/9"
-              height="18vh"
-              width="32vh"
-            ></v-img>
-            <v-card-text>
-              <h3>{{ card.name }}</h3>
-              <p>{{ card.detail }}</p>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="primary" class="mr-4" style="margin: auto;">
-                <v-icon right>mdi-arrow-right</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>    
+  <v-row>
+    <v-col
+      v-for="(card, index) in list"
+      :key="index"
+      cols="6"
+      sm="6"
+      md="3"
+      lg="2"
+    >
+      <v-card link>
+        <!-- 图片存在时渲染图片 -->
+        <v-img v-if="card.picurl"
+          class="image-container"
+          :src="card.picurl"
+          alt="Card Image"
+          aspect-ratio="16/9"
+        ></v-img>
+        <!-- 图片不存在时渲染占位 div -->
+        <div v-else class="replace-img"></div>
+        <v-card-text>
+          <h3>{{ card.name }}</h3>
+          <p>{{ card.detail }}</p>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
+</v-container>
+
   
-    <v-pagination :length="10" class="fixed-pagination" :total-visible="7" rounded></v-pagination>
+    <v-pagination v-if="ViewPort.isDesktop" :length="10" class="fixed-pagination" :total-visible="7" rounded></v-pagination>
+    <v-pagination v-if="ViewPort.isTablet" :length="7" class="fixed-pagination" :total-visible="7" rounded></v-pagination>
+    <v-pagination v-if="ViewPort.isMobile" :length="5" class="fixed-pagination" :total-visible="7" rounded></v-pagination>
+
   </template>
   
   <script setup lang="ts">
   import { ref, reactive } from "vue";
+  import { useViewPortStore } from "@/stores/viewportState";
+
+  const ViewPort = useViewPortStore();
   
   interface tcm {
     name: string;
@@ -58,6 +61,9 @@
     },
     { name: "鹿鞭", detail: "鹿鞭是补气养生的佳品" },
     { name: "鹿胎", detail: "鹿胎是补气养生的佳品" },
+    { name: "鹿胎", detail: "鹿胎是补气养生的佳品" },
+    { name: "鹿胎", detail: "鹿胎是补气养生的佳品" },
+    { name: "鹿胎", detail: "鹿胎是补气养生的佳品" },
   ]);
   </script>
   
@@ -70,5 +76,22 @@
     transform: translateX(-50%); /* 居中分页组件 */
     z-index: 1000; /* 确保分页在上层 */
   }
+
+  .image-container {
+  margin: auto;
+  object-fit: cover;
+  height: auto;
+}
+
+.replace-img {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* 确保占位 div 和 v-img 高宽比一致 */
+  background-color: #f0f0f0; /* 可自定义背景色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
   </style>
   
