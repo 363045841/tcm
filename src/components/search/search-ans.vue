@@ -93,7 +93,11 @@ let isFirstSearch: boolean = true;
 // 将函数逻辑封装为一个防抖处理的函数
 const debouncedWatchHandler = debounce(
   async (val: string) => {
-    
+    if (props.searchText === "") {
+      filteredItems.value = dataStore.historyAlertTitle;
+      return;
+    }
+    console.log("搜索关键词", val);
     loadingAttr.value = true;
     setTimeout(() => {
       loadingAttr.value = false;
@@ -117,22 +121,23 @@ const debouncedWatchHandler = debounce(
     if (filteredItems.value.length === 0) {
       filteredItems.value = dataStore.emptytitle;
     }
-
-    console.log("filteredItems", filteredItems.value);
+    /* console.log("filteredItems", filteredItems.value); */
     dataStore.computeStrongRange(val);
   },
   500 // 防抖延时
 );
 
+//watch到变化了但是
 watch(
   () => props.searchText,
-  (val) => {
-    if(isFirstSearch) {
+  async (val) => {
+    console.log("watching", val);
+    if(isFirstSearch || val === "") {
       isFirstSearch = false;
       //展示初始值(like 历史记录)
       filteredItems.value = dataStore.historyAlertTitle;
     }else{
-      debouncedWatchHandler(val); // 调用防抖函数
+      await debouncedWatchHandler(val); // 调用防抖函数
     }
   },
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示

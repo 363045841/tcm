@@ -101,7 +101,7 @@ const onInput = (event: Event) => {
   if (!isComposing.value) {
     searchText.value = (event.target as HTMLInputElement).value;
     finalizedSearchText.value = searchText.value;
-    console.log("search text", searchText.value);
+    console.log("search text", finalizedSearchText.value);
   }
 };
 
@@ -109,6 +109,7 @@ const onCompositionEnd = (event: CompositionEvent) => {
   isComposing.value = false;
   searchText.value = (event.target as HTMLInputElement).value;
   finalizedSearchText.value = searchText.value;
+  console.log("search text", finalizedSearchText.value);
 };
 
 let searchPrefer = ref<string>("全部");
