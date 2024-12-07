@@ -146,6 +146,7 @@ watch(
 
 async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
   let backupUrl: string = "http://" + import.meta.env.VITE_IP + ":" + import.meta.env.VITE_BACKEND_PORT;
+  console.log("backupUrl", backupUrl);
   try {
     const response = await fetch(backupUrl + "/json");
     const data = await response.json(); // 假设服务器返回的是一个 TitleInfo 数组
