@@ -33,7 +33,7 @@
             height="16vh"
           ></v-img>
 
-          <v-card-text>
+          <v-card-text style="height: 9vh;">
             <h3>{{ card.name }}</h3>
             <p>{{ card.detail }}</p>
           </v-card-text>
@@ -43,28 +43,10 @@
   </v-container>
   <input ref="testDOM" />
   
-  <!-- 先这么写，后面再改这个难绷写法 -->
   <v-pagination
-    v-if="ViewPort.isDesktop"
-    :length="10"
+    :length="screenInfo.paginLength"
     class="fixed-pagination"
-    :total-visible="7"
-    v-model:model-value="page"
-    ref="pagination"
-  ></v-pagination>
-  <v-pagination
-    v-if="ViewPort.isTablet"
-    :length="7"
-    class="fixed-pagination"
-    :total-visible="7"
-    v-model:model-value="page"
-    ref="pagination"
-  ></v-pagination>
-  <v-pagination
-    v-if="ViewPort.isMobile"
-    :length="5"
-    class="fixed-pagination"
-    :total-visible="7"
+    :total-visible="screenInfo.paginTotalVisible"
     v-model:model-value="page"
     ref="pagination"
   ></v-pagination>
@@ -81,8 +63,11 @@ let screenInfo = reactive({
   height: 0,
   showBegin: 0,
   showEnd: 0,
+  paginLength: 0,
+  paginTotalVisible: 0,
 });
 import { VContainer } from "vuetify/components";
+import { useDisplay } from "vuetify";
 const pagination = ref<InstanceType<typeof VContainer> | null>(null);
 
 let list = reactive<tcm[]>([
@@ -127,18 +112,41 @@ let list = reactive<tcm[]>([
   { name: "鹿鞭28", detail: "鹿鞭是补气养生的佳品" },
 ]);
 watch(page, (val) => {
+  updateScreenInfo();
+});
+
+function updateScreenInfo() {
+  console.log("update",viewPortStore.isDesktop,viewPortStore.isTablet,viewPortStore.isMobile)
+  if(viewPortStore.isDesktop) {
+    screenInfo.width = 6;
+  } else if(viewPortStore.isTablet) {
+    screenInfo.width = 4;
+  } else {
+    screenInfo.width = 2;
+  }
   screenInfo.width = (viewPortStore.isDesktop) ? 6 : viewPortStore.isTablet ? 4 : 2;
-  const viewportHeight = window.innerHeight - 20 - 64 - 10;
+  const viewportHeight = window.innerHeight - 65 - 64 - 12;
+  console.log("viewportHeight", viewportHeight)
   //const containerHeight = container.value?.$el.clientHeight;
-  screenInfo.height = Math.floor(viewportHeight / (16 * 0.01 * viewportHeight + 100));
+  console.log("each height", (25 * 0.01 * window.innerHeight + 24) + "px")
+  screenInfo.height = Math.floor(viewportHeight / (16 * 0.01 * window.innerHeight + 24)) - 1;
   screenInfo.showBegin = (page.value - 1) * (screenInfo.width * screenInfo.height)
   screenInfo.showEnd = screenInfo.showBegin + screenInfo.width * screenInfo.height;
   if(screenInfo.showEnd > list.length) screenInfo.showEnd = list.length;
-  console.log(screenInfo);
-}, { immediate: true });
+  screenInfo.paginLength = Math.ceil(list.length / (screenInfo.width * screenInfo.height));
+  console.log(screenInfo)
+}
+
+onMounted(() => {
+  document.body.style.overflow = "hidden";
+  viewPortStore.setViewport();
+  console.log("state",viewPortStore.$state)
+  updateScreenInfo();
+  screenInfo.paginTotalVisible = useDisplay().xs.value ? 3 : useDisplay().sm.value ? 5 : 7;
+  
+});
 
 let showCardArray = computed(() => {
-  console.log("update");
   return list.slice(screenInfo.showBegin, screenInfo.showEnd);
 });
 
@@ -168,7 +176,7 @@ onMounted(() => {
 <style scoped>
 .fixed-pagination {
   position: fixed;
-  bottom: 20px; /* 距离底部 20px */
+  bottom: 5px; /* 距离底部 20px */
   left: 50%;
   transform: translateX(-50%); /* 居中分页组件 */
   z-index: 1000; /* 确保分页在上层 */

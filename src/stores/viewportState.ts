@@ -1,14 +1,15 @@
 // Utilities
 import { defineStore } from 'pinia'
+import { useDisplay } from 'vuetify';
 
 interface viewportAttr {
   viewport: { width: number; height: number };
 }
 
 interface deviceInfo {
-  isMobile: boolean;
-  isTablet: boolean;
-  isDesktop: boolean;
+  isMobile: boolean | null;
+  isTablet: boolean | null;
+  isDesktop: boolean | null;
 }
 
 interface viewportStore extends viewportAttr, deviceInfo { }
@@ -19,32 +20,31 @@ export const useViewPortStore = defineStore('viewportState', {
       width: 0,
       height: 0,
     },
-    isMobile: false,
-    isTablet: false,
-    isDesktop: true,
+    isMobile: null,
+    isTablet: null,
+    isDesktop: null,
   }),
   getters: {
-    getViewportState(): deviceInfo {
-      return {
-        isMobile: this.isMobile,
-        isTablet: this.isTablet,
-        isDesktop: this.isDesktop,
-      };
-    }    
+    
   },
   actions: {
-    setViewportState() {
-      const width = window.innerWidth;
-      this.isDesktop = width > 1024 ? true : false;
-      this.isTablet = width > 768 && width <= 1024 ? true : false;
-      this.isMobile = width <= 768 ? true : false;
-    },
-    setViewport(width: number, height: number) {
-      this.viewport = { width, height };
-    },
-    updateAttr(){
-      this.setViewportState();
-      this.setViewport(window.innerWidth, window.innerHeight);
+    setViewport() {
+      if(window.innerWidth < 768) {
+        this.isMobile = true;
+        this.isTablet = false;
+        this.isDesktop = false;
+      }
+      else if(window.innerWidth < 1024) {
+        this.isMobile = false;
+        this.isTablet = true;
+        this.isDesktop = false;
+      }
+      else {
+        this.isMobile = false;
+        this.isTablet = false;
+        this.isDesktop = true;
+      }
+
     }
   }
 })

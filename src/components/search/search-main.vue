@@ -83,10 +83,10 @@ import { useDisplay } from "vuetify";
 
 // 响应式状态处理
 const viewportStore = useViewPortStore();
-viewportStore.setViewportState();
+viewportStore.setViewport();
 onMounted(() => {
   viewportStore.updateAttr();
-  console.log(viewportStore.getViewportState);
+  console.log(viewportStore.getViewport);
   console.log(useDisplay().name.value);
 });
 

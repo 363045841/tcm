@@ -12,10 +12,10 @@
 
 <script lang="ts" setup>
 import searchMain from "@/components/search/search-main.vue";
-onMounted(() => {
-  console.log("mounted");
+onMounted(() => { 
   document.body.style.overflow = "hidden";
-});
+} // 禁止 routerview 滚动
+);
 </script>
 
 <style scoped>
