@@ -8,9 +8,11 @@
   >
     <v-list-item
       v-for="(item, index) in filteredItems"
+      class="search-item"
       :key="index"
       :subtitle="item.subtitle"
       :prepend-avatar="item.avatar"
+      @click.stop="clickSearchItem"
     >
       <template #title>
         <span>
@@ -67,6 +69,11 @@ import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
 import loading from "./search-loading.vue";
+
+function clickSearchItem(): void {
+  console.log("点击搜索项");
+}
+
 
 const dataStore = useComponentsSearchItemStore();
 const props = defineProps({

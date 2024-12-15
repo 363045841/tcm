@@ -12,7 +12,7 @@
             v-model:model-value="searchText"
             :hide-details="true"
             @focus="(move = true), (showStore.searchFocus = true)"
-            @blur="(move = false), (showStore.searchFocus = false)"
+            @blur="(move = false); if(searchText == ''){ showStore.searchFocus = false } else { showStore.searchFocus = true }"
             @input="onInput"
             @compositionstart="isComposing = true"
             @compositionend="onCompositionEnd"
@@ -79,15 +79,12 @@ import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./search-ans.vue";
 import { useViewPortStore } from "@/stores/viewportState";
-import { useDisplay } from "vuetify";
 
 // 响应式状态处理
 const viewportStore = useViewPortStore();
 viewportStore.setViewport();
 onMounted(() => {
-  viewportStore.updateAttr();
-  console.log(viewportStore.getViewport);
-  console.log(useDisplay().name.value);
+  viewportStore.setViewport();
 });
 
 const showStore = useComponentsShowStore();
