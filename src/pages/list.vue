@@ -176,7 +176,7 @@ onMounted(() => {
 <style scoped>
 .fixed-pagination {
   position: fixed;
-  bottom: 5px; /* 距离底部 20px */
+  bottom: 8px; /* 距离底部 20px */
   left: 50%;
   transform: translateX(-50%); /* 居中分页组件 */
   z-index: 1000; /* 确保分页在上层 */
