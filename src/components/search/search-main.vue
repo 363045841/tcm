@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container @mouseleave="showStore.mouseOnSearchContainer = false" @mouseover="showStore.mouseOnSearchContainer = true">
     <v-row style="padding-bottom: 0px">
       <!-- search box -->
       <v-col style="padding-left: 0px">
@@ -11,8 +11,8 @@
             rounded
             v-model:model-value="searchText"
             :hide-details="true"
-            @focus="(move = true), (showStore.searchFocus = true)"
-            @blur="(move = false); if(searchText == ''){ showStore.searchFocus = false } else { showStore.searchFocus = true }"
+            @focus="((move = true), (showStore.searchFocus = true))"
+            @blur="textFieldLoseFocus"
             @input="onInput"
             @compositionstart="isComposing = true"
             @compositionend="onCompositionEnd"
@@ -66,9 +66,10 @@
     <!-- search answer -->
     <v-row>
       <v-col style="padding: 0px">
-        <searchAns 
-        v-if="showStore.searchFocus"
-        :searchText="finalizedSearchText" />
+        <searchAns
+          v-if="showStore.searchFocus"
+          :searchText="finalizedSearchText"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -80,6 +81,13 @@ import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./search-ans.vue";
 import { useViewPortStore } from "@/stores/viewportState";
 
+const showStore = useComponentsShowStore();
+
+function textFieldLoseFocus() {
+  if(showStore.mouseOnSearchContainer) showStore.searchFocus = true;
+  else showStore.searchFocus = false;
+}
+
 // 响应式状态处理
 const viewportStore = useViewPortStore();
 viewportStore.setViewport();
@@ -87,7 +95,9 @@ onMounted(() => {
   viewportStore.setViewport();
 });
 
-const showStore = useComponentsShowStore();
+
+
+let searchPrefer = ref<string>("全部"); // 搜索偏好选项
 let searchText = ref<string>(""); // 用户输入的搜索内容
 let move = ref<boolean>(false); // 用于控制搜索框的移动
 
@@ -109,16 +119,13 @@ const onCompositionEnd = (event: CompositionEvent) => {
   console.log("search text", finalizedSearchText.value);
 };
 
-let searchPrefer = ref<string>("全部");
+
 /* watch(searchPrefer, () => {
   console.log("search prefer", searchPrefer.value);
 }); */
-
-
 </script>
 
 <style scoped>
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;

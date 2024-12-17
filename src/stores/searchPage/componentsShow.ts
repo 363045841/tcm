@@ -5,6 +5,7 @@ export const useComponentsShowStore = defineStore('componentsShow', {
   state: () => ({
     searchShow: false,
     searchFocus: false,
+    mouseOnSearchContainer: false,
   }),
   getters: {},
   actions: {

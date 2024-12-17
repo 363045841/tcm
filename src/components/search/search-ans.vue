@@ -92,7 +92,7 @@
     </v-container>
   </v-list>
   <!-- 后面也许用插槽实现,在search组件上控制加载进度 -->
-  <loading v-if="loadingAttr"></loading>
+  <!-- <loading v-if="loadingAttr"></loading> -->
 </template>
 
 <script setup lang="ts">
@@ -100,6 +100,9 @@ import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
 import loading from "./search-loading.vue";
+import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
+
+const showStore = useComponentsShowStore();
 
 let historyListClosable = ref<boolean>(false);
 
@@ -140,7 +143,7 @@ function deleteHistoryListStorage(newItem: string) {
     );
     if (historyList != null) {
       let it = historyList.indexOf(newItem);
-      if(it != -1) historyList.splice(it, 1);
+      if (it != -1) historyList.splice(it, 1);
       console.log("historyList", historyList);
       localStorage.setItem("historyList", JSON.stringify(historyList));
     }
@@ -148,8 +151,6 @@ function deleteHistoryListStorage(newItem: string) {
     console.error("Error updating history list:", error);
   }
 }
-    
-
 
 function clickSearchItem(item: TitleInfo) {
   console.log("clickSearchItem", item.title);
