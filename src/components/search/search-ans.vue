@@ -166,7 +166,7 @@ setTimeout(() => {
 // 搜索关键词并渲染搜索结果
 import { debounce } from "lodash"; // 引入防抖函数
 const filteredItems = ref<Array<TitleInfo>>([]);
-let isFirstSearch: boolean = true;
+
 // 将函数逻辑封装为一个防抖处理的函数
 const debouncedWatchHandler = debounce(
   async (val: string) => {
@@ -207,18 +207,24 @@ const debouncedWatchHandler = debounce(
 let historyListVList: string[] | null = JSON.parse(
   localStorage.getItem("historyList") || "[]",
 );
+
+let isFirstSearchStore = useComponentsSearchItemStore();
 watch(
   () => props.searchText,
   async (val) => {
     console.log("watching", val);
-    if (isFirstSearch || val === "") {
-      isFirstSearch = false;
+    if (isFirstSearchStore.isFirstSearch || val === "") {
+      console.log(isFirstSearchStore.isFirstSearch, val)
+      isFirstSearchStore.isFirstSearch = false;
       // 渲染历史记录
       filteredItems.value = dataStore.historyAlertTitle;
+      console.log("historyListVList", historyListVList);
       historyListVList = JSON.parse(
         localStorage.getItem("historyList") || "[]",
       );
     } else {
+      isFirstSearchStore.isFirstSearch = false;
+      console.log("发起搜索", val);
       await debouncedWatchHandler(val); // 调用防抖函数
     }
   },
