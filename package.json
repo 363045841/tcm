@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
+    "axios": "^1.7.9",
     "core-js": "^3.39.0",
     "dotenv": "^16.4.7",
     "lodash": "^4.17.21",
@@ -15,7 +16,7 @@
     "roboto-fontface": "^0.10.0",
     "vue": "^3.5.13",
     "vue-markdown": "^2.2.4",
-    "vuetify": "^3.7.5"
+    "vuetify": "^3.7.6"
   },
   "devDependencies": {
     "@babel/types": "^7.26.3",
@@ -43,6 +44,6 @@
     "vite-plugin-vue-layouts": "^0.11.0",
     "vite-plugin-vuetify": "^2.0.4",
     "vue-router": "^4.5.0",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.2.0"
   }
 }
