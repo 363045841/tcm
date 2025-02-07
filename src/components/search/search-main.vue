@@ -5,7 +5,7 @@
       <v-col style="padding-left: 0px">
         <transition name="fade" mode="out-in">
           <v-text-field
-            v-if="showStore.searchShow"
+            v-show="showStore.searchShow"
             variant="outlined"
             label="搜索"
             rounded

@@ -4,19 +4,30 @@
       <v-app-bar color="#000000" :elevation="2">
         <template #prepend>
           <v-app-bar-nav-icon />
-          <v-app-bar-title style="font-size: large;">我超,中医药</v-app-bar-title>
-          <router-link class="nav-link" to="/" style="margin-left: 5vh;font-size: large;">
+          <v-app-bar-title style="font-size: large"
+            >我超,中医药</v-app-bar-title
+          >
+          <router-link
+            class="nav-link"
+            to="/"
+            style="margin-left: 5vh; font-size: large"
+          >
             首页
           </router-link>
-          <router-link class="nav-link" to="/list" style="font-size: large;">
+          <router-link class="nav-link" to="/list" style="font-size: large">
             全部
           </router-link>
+          <router-link
+            class="nav-link"
+            :to="`/item/${randomNum}`"
+            style="font-size: large"
+            @click="generateRandomNumber()"
+          >
+            随机页面
+          </router-link>
         </template>
-
-        
-        
       </v-app-bar>
-      <router-view class="router-view"></router-view>
+      <router-view class="router-view" :key="randomNum"></router-view>
     </v-main>
   </v-app>
 </template>
@@ -27,11 +38,26 @@ const showStore = useComponentsShowStore();
 setTimeout(() => {
   showStore.searchShow = true;
 }, 100);
+
+// 随机页面功能
+let randomNum = ref<number>(Math.floor(Math.random() * 100));
+const generateRandomNumber = () => {
+  let maxPage: number = 899;
+  fetch("http://localhost:3001/api/v1/medinfo/length", { method: "GET" })
+    .then((res) => res.json())
+    .then((data) => {
+      maxPage = data.length || 899;
+    })
+    .catch((error) => console.log(error));
+
+  randomNum.value = Math.floor(Math.random() * maxPage) + 1;
+  const router = useRouter();
+  router.push(`/item/${randomNum.value}`);
+};
 </script>
 
 <style scoped>
 .router-view {
-  
   height: calc(100vh - 64px) !important;
 }
 .nav-link {

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang='ts' name=''>
-import { ref, reactive} from 'vue'
+  console.log('page router load!!')
 
 </script>
 <style scoped>
