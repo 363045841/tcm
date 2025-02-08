@@ -3,7 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_OUT_PATH: string;
   readonly VITE_BACKEND_PORT: number;
-  readonly VITE_SERVER_IP: string;
+  readonly VITE_IP: string;
   // 在这里添加更多的环境变量
 }
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { type MedicineData } from '@/pages/item/[name].vue'
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_SERVER_IP + '/' + import.meta.env.VITE_BACKEND_PORT,
+    baseURL: import.meta.env.VITE_IP + '/' + import.meta.env.VITE_BACKEND_PORT,
     timeout: 1000,
 });
 

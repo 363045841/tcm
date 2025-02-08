@@ -4,6 +4,7 @@
   "scripts": {
     "serve": "vite serve",
     "dev": "vite",
+    "preview": "vite preview",
     "build": "vite build --emptyOutDir"
   },
   "dependencies": {

@@ -1,10 +1,14 @@
 <template>
-  <v-row style="width:60%;margin: 5vh;" class="d-flex flex-nowrap">
-    <v-col cols="10" style="margin-left: 10vh;">
+  <v-row style="width: 60%; margin: 5vh" class="d-flex flex-nowrap">
+    <v-col cols="10" style="margin-left: 10vh">
       <Info @updatePicUrl="handlePicUrl"></Info>
     </v-col>
     <v-col cols="2">
-      <img :src="`http://www.zhongyoo.com/${picUrl}`" alt="中药图片" style="margin-top: 10vh;"/>
+      <img
+        :src="`http://www.zhongyoo.com/${picUrl}`"
+        alt="中药图片"
+        style="margin-top: 10vh"
+      />
     </v-col>
   </v-row>
 </template>
@@ -16,7 +20,6 @@ import { ref, reactive } from "vue";
 const picUrl = ref("");
 
 const handlePicUrl = (url: string) => {
-  console.log('得到',url);
   picUrl.value = url;
 };
 </script>

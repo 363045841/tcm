@@ -1,7 +1,6 @@
 // Utilities
 import { defineStore } from 'pinia';
 
-
 export interface TitleInfo {
   id: number;
   title: string;
