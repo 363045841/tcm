@@ -11,16 +11,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { fetchItemData } from "@/mocks/item";
-
 
 const emit = defineEmits(["updatePicUrl"]);
 
 const sendPicUrl = (url: string) => {
-    console.log("发送图片地址", url);
-    emit("updatePicUrl", url);
-}
-
+  emit("updatePicUrl", url);
+};
 
 interface routerParams {
   id: number;
@@ -29,17 +25,20 @@ interface routerParams {
 onMounted(() => {
   const router = useRoute();
   const ID = (router.params as routerParams).id;
-  fetch("http://localhost:3001/api/v1/medinfo/page/" + ID)
+  fetch(
+    `http://${import.meta.env.VITE_IP}:${
+      import.meta.env.VITE_BACKEND_PORT
+    }/api/v1/medinfo/page/${ID}`
+  )
     .then((res) => res.json()) // 解析 JSON 只调用一次
     .then((data) => {
-      console.log("fetch数据", data);
       return data;
     })
     .then((res) => {
       for (const key in chineseMedicineData.value) {
         chineseMedicineData.value[key as keyof MedicineData] = res[key];
       }
-      sendPicUrl((res as MedicineData).pic)
+      sendPicUrl((res as MedicineData).pic);
     })
     .catch((error) => console.error("Fetch 错误:", error));
 

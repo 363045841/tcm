@@ -67,9 +67,13 @@
     <v-row>
       <v-col style="padding: 0px">
         <searchAns
-          v-if="showStore.searchFocus"
+         
           :searchText="finalizedSearchText"
         />
+        <!-- <searchAns
+          v-if="showStore.searchFocus"
+          :searchText="finalizedSearchText"
+        /> -->
       </v-col>
     </v-row>
   </v-container>
