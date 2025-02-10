@@ -38,7 +38,7 @@
             item.title.substring(dataStore.strongTitle.get(item.id)?.[1] ?? 0)
           }}</span>
           </div>
-          <span>
+          <span v-if="item.isFuzzy">
             <b style="font-size: small;color: gray;">关联词:{{ item.fuzzyWord }} </b>
           </span>
         </div>
@@ -202,9 +202,10 @@ const debouncedWatchHandler = debounce(
         subtitle: word.description,
         avatar: `http://www.zhongyoo.com/${word.picUrl}`,
         fuzzyWord: word.word,
+        isFuzzy: word.isFuzzy
       });
     }
-    dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
+    // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     console.log("加载的标题：", dataStore.title);
     console.log("strong title", dataStore.strongTitle);
     console.log("strong subtitle", dataStore.strongSubTitle);
@@ -269,6 +270,7 @@ interface FuzzySearchRes {
   title: string;
   description: string;
   picUrl: string;
+  isFuzzy: boolean;
 }
 
 // 真实模糊搜索接口调用
@@ -285,7 +287,7 @@ async function getFuzzySearchAns(
 
     // console.log("loaded 搜索结果！", data);
     // (data as searchResult[]).sort((a, b) => b.similarity - a.similarity); // 降序排序
-    // console.log("排序后的搜索结果！", data);
+    console.log("搜索结果！",url, data);
 
     return data as FuzzySearchRes[];
   } catch (error) {

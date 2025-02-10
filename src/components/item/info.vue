@@ -1,6 +1,6 @@
 <template>
-  <div style="">
-    <div v-for="([key, value], index) in Object.entries(propertyMap)">
+  <div>
+    <div v-for="([key, value], index) in Object.entries(propertyMap)" :key="index">
       <h2 v-if="index >= 1" style="line-height: 2">{{ value }}</h2>
       <p v-if="index >= 1" style="line-height: 2">
         {{ chineseMedicineData[key as keyof MedicineData] }}
@@ -23,6 +23,8 @@ interface routerParams {
 }
 
 onMounted(() => {
+  document.body.style.overflow = "auto";
+  
   const router = useRoute();
   const ID = (router.params as routerParams).id;
   fetch(

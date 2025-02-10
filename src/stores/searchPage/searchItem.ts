@@ -7,6 +7,7 @@ export interface TitleInfo {
   subtitle: string;
   avatar: string;
   fuzzyWord: string;
+  isFuzzy: boolean;
 }
 
 export interface Item {
@@ -26,28 +27,32 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
       title: "没有搜索到相关内容",
       subtitle: "",
       avatar: "",
-      fuzzyWord: ""
+      fuzzyWord: "",
+      isFuzzy: false
     }],
     emptytitle: [{
       id: 0,
       title: "没有搜索到相关内容",
       subtitle: "",
       avatar: "",
-      fuzzyWord: ""
+      fuzzyWord: "",
+      isFuzzy: false
     }],
     historyAlertTitle: [{
       id: 0,
       title: "没有历史记录",
       subtitle: "",
       avatar: "",
-      fuzzyWord: ""
+      fuzzyWord: "",
+      isFuzzy: false
     }],
     history: [{
       id: 0,
       title: "这是历史记录，但我并没有做这个功能，略略略",
       subtitle: "",
       avatar: "",
-      fuzzyWord: ""
+      fuzzyWord: "",
+      isFuzzy: false
     }],
     strongTitle: new Map<number, [number, number]>(),
     strongSubTitle: new Map<number, [number, number]>(),
