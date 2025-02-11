@@ -71,23 +71,25 @@
     <div
       class="sticky-footer"
       style="
-        height: 45px;
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-wrap: wrap; /* 内容换行 */
+        min-height: 45px; /* 最小高度 */
+        padding-bottom: 5px;
       "
     >
-      <span style="margin: 10px">猜你想搜</span>
+      <span style="margin: 10px; white-space: nowrap">猜你想搜</span>
       <span
         v-for="(item, index) in FuzzySearchResStore.searchShow"
         :key="index"
-        style="margin: 10px; color: rgb(16, 104, 191)"
-        @click="
-          clickSearchItem({
-            id: item.id,
-            item: item.title,
-          })
+        style="
+          margin-left: 10px;
+          margin-right: 10px;
+          color: rgb(16, 104, 191);
+          white-space: nowrap;
         "
+        @click="clickSearchItem({ id: item.id, item: item.title })"
       >
         {{ item.title }}
       </span>
@@ -118,7 +120,10 @@
         :key="index"
         style="margin: 4px"
         @click:close="deleteHistoryListStorage(item)"
-        @click="emit('changeFatherSearchText', item)"
+        @click="
+          emit('changeFatherSearchText', item);
+          debouncedWatchHandler(item);
+        "
         :closable="historyListClosable"
       >
         {{ item }}
@@ -211,7 +216,7 @@ setTimeout(() => {
 // 搜索关键词并渲染搜索结果
 import { debounce } from "lodash"; // 引入防抖函数
 import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
-import { sequenceExpression } from "@babel/types";
+
 const filteredItems = ref<Array<TitleInfo>>([]);
 
 // 将函数逻辑封装为一个防抖处理的函数
@@ -249,6 +254,25 @@ const debouncedWatchHandler = debounce(
         });
       }
     }
+    dataStore.title.sort((a, b) => {
+      if (a.title === query) {
+        return -1;
+      } else if (a.title.indexOf(query) !== -1) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    for(let i = 0; i < dataStore.title.length; i++) {
+      if(dataStore.title[i].title === query){
+        dataStore.title.unshift(dataStore.title[i])
+        dataStore.title.splice(i+1, 1)
+        break;
+      }
+    }
+    console.log("长度",dataStore.title.length)
+    
+
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     console.log("加载的标题：", dataStore.title);
     console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
@@ -309,8 +333,6 @@ async function getFuzzySearchAns(
     const res = await fetch(url, { method: "GET" });
     const data = await res.json();
 
-    // console.log("loaded 搜索结果！", data);
-    // (data as searchResult[]).sort((a, b) => b.similarity - a.similarity); // 降序排序
     console.log("搜索结果！", url, data);
 
     return data as FuzzySearchRes[];

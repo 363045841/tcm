@@ -90,6 +90,7 @@ import { useViewPortStore } from "@/stores/viewportState";
 
 function receiveChildSearchText(childSearchText: string) {
   searchText.value = childSearchText;
+  finalizedSearchText.value = childSearchText;
 }
 
 const showStore = useComponentsShowStore();
