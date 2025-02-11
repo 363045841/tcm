@@ -67,8 +67,10 @@
     <v-row>
       <v-col style="padding: 0px">
         <searchAns
-         
+
           :searchText="finalizedSearchText"
+
+          @changeFatherSearchText="receiveChildSearchText"
         />
         <!-- <searchAns
           v-if="showStore.searchFocus"
@@ -84,6 +86,10 @@ import { ref } from "vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 import searchAns from "./search-ans.vue";
 import { useViewPortStore } from "@/stores/viewportState";
+
+function receiveChildSearchText(childSearchText: string) {
+  searchText.value = childSearchText;
+}
 
 const showStore = useComponentsShowStore();
 

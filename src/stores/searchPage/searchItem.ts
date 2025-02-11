@@ -1,5 +1,5 @@
 // Utilities
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
 export interface TitleInfo {
   id: number;
@@ -20,40 +20,48 @@ export interface Item {
   isFirstSearch: boolean;
 }
 
-export const useComponentsSearchItemStore = defineStore('searchItem', {
+export const useComponentsSearchItemStore = defineStore("searchItem", {
   state: (): Item => ({
-    title: [{
-      id: 0,
-      title: "没有搜索到相关内容",
-      subtitle: "",
-      avatar: "",
-      fuzzyWord: "",
-      isFuzzy: false
-    }],
-    emptytitle: [{
-      id: 0,
-      title: "没有搜索到相关内容",
-      subtitle: "",
-      avatar: "",
-      fuzzyWord: "",
-      isFuzzy: false
-    }],
-    historyAlertTitle: [{
-      id: 0,
-      title: "没有历史记录",
-      subtitle: "",
-      avatar: "",
-      fuzzyWord: "",
-      isFuzzy: false
-    }],
-    history: [{
-      id: 0,
-      title: "这是历史记录，但我并没有做这个功能，略略略",
-      subtitle: "",
-      avatar: "",
-      fuzzyWord: "",
-      isFuzzy: false
-    }],
+    title: [
+      {
+        id: 0,
+        title: "没有搜索到相关内容",
+        subtitle: "",
+        avatar: "",
+        fuzzyWord: "",
+        isFuzzy: false,
+      },
+    ],
+    emptytitle: [
+      {
+        id: 0,
+        title: "没有搜索到相关内容",
+        subtitle: "",
+        avatar: "",
+        fuzzyWord: "",
+        isFuzzy: false,
+      },
+    ],
+    historyAlertTitle: [
+      {
+        id: 0,
+        title: "没有历史记录",
+        subtitle: "",
+        avatar: "",
+        fuzzyWord: "",
+        isFuzzy: false,
+      },
+    ],
+    history: [
+      {
+        id: 0,
+        title: "这是历史记录，但我并没有做这个功能，略略略",
+        subtitle: "",
+        avatar: "",
+        fuzzyWord: "",
+        isFuzzy: false,
+      },
+    ],
     strongTitle: new Map<number, [number, number]>(),
     strongSubTitle: new Map<number, [number, number]>(),
     isFirstSearch: true,
@@ -83,6 +91,6 @@ export const useComponentsSearchItemStore = defineStore('searchItem', {
         }
       }
       //console.log(1, toRaw(Array.from(this.strongTitle.entries())));
-    }
-  }
+    },
+  },
 });

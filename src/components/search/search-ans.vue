@@ -5,7 +5,7 @@
     class="search-list"
     rounded
     elevation="1"
-    style="max-height: 60vh; overflow-y: auto;"
+    style="max-height: 60vh; overflow-y: auto; padding-bottom: 0px"
   >
     <v-list-item
       v-for="(item, index) in filteredItems"
@@ -13,62 +13,61 @@
       :key="index"
       :subtitle="item.subtitle"
       :prepend-avatar="item.avatar"
-      @click="clickSearchItem(item)"
+      @click="clickSearchItem({
+        id: item.id,
+        item: item.title
+      })"
     >
       <template #title>
         <div style="display: flex; justify-content: space-between; width: 100%">
-          <div>
-          <span>
-            {{
-              item.title.substring(
-                0,
-                dataStore.strongTitle.get(item.id)?.[0] ?? 0
-              )
-            }}
-          </span>
-          <span
-            ><b>{{
-              item.title.substring(
-                dataStore.strongTitle.get(item.id)?.[0] ?? 0,
-                dataStore.strongTitle.get(item.id)?.[1] ?? 0
-              )
-            }}</b></span
-          >
-          <span>{{
-            item.title.substring(dataStore.strongTitle.get(item.id)?.[1] ?? 0)
-          }}</span>
+          <div v-if="item.title.indexOf(searchText) !== -1">
+            <span>{{ item.title.substring(0, item.title.indexOf(searchText)) }}</span>
+            <b>{{ item.title.substring(item.title.indexOf(searchText), item.title.indexOf(searchText) + searchText.length) }}</b>
+            <span>{{ item.title.substring(item.title.indexOf(searchText) + searchText.length) }}</span>
           </div>
+          <div v-else>{{ item.title }}</div>
           <span v-if="item.isFuzzy">
-            <b style="font-size: small;color: gray;">关联词:{{ item.fuzzyWord }} </b>
+            <b style="font-size: small; color: gray"
+              >关联词:{{ item.fuzzyWord }}
+            </b>
           </span>
         </div>
       </template>
-      
 
       <template #subtitle>
-        <span>
-          {{
-            item.subtitle.substring(
-              0,
-              dataStore.strongSubTitle.get(item.id)?.[0] ?? 0
-            )
-          }}
-        </span>
-        <span
-          ><b>{{
-            item.subtitle.substring(
-              dataStore.strongSubTitle.get(item.id)?.[0] ?? 0,
-              dataStore.strongSubTitle.get(item.id)?.[1] ?? 0
-            )
-          }}</b></span
-        >
-        <span>{{
-          item.subtitle.substring(
-            dataStore.strongSubTitle.get(item.id)?.[1] ?? 0
-          )
-        }}</span>
+        <div v-if="item.subtitle.indexOf(searchText) !== -1">
+          <span>{{ item.subtitle.substring(0, item.subtitle.indexOf(searchText)) }}</span>
+          <b>{{ item.subtitle.substring(item.subtitle.indexOf(searchText), item.subtitle.indexOf(searchText) + searchText.length) }}</b>
+          <span>{{ item.subtitle.substring(item.subtitle.indexOf(searchText) + searchText.length) }}</span>
+        </div>
+        <div v-else>{{ item.subtitle }}</div>
+
+
       </template>
     </v-list-item>
+
+    <div
+      class="sticky-footer"
+      style="
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <span style="margin: 10px;">猜你想搜</span>
+      <span
+        v-for="(item, index) in FuzzySearchResStore.searchShow"
+        :key="index"
+        style="margin: 10px;color:rgb(16, 104, 191);"
+        @click="clickSearchItem({
+          id: item.id,
+          item: item.title
+        })"
+      >
+        {{ item.title }}
+      </span>
+    </div>
   </v-list>
   <v-list
     v-if="props.searchText.length == 0"
@@ -95,6 +94,8 @@
         :key="index"
         style="margin: 4px"
         @click:close="deleteHistoryListStorage(item)"
+        @click="emit('changeFatherSearchText', item)"
+
         :closable="historyListClosable"
       >
         {{ item }}
@@ -111,12 +112,16 @@ import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
 import loading from "./search-loading.vue";
 import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
+import { FuzzyItem } from "@/stores/searchPage/fuzzySearchRes";
 
 const showStore = useComponentsShowStore();
+const emit = defineEmits(["changeFatherSearchText"]);
+
 
 let historyListClosable = ref<boolean>(false);
 
 const dataStore = useComponentsSearchItemStore();
+const FuzzySearchResStore = useComponentsFuzzyShowStore();
 const props = defineProps({
   searchText: {
     // 搜索关键词prop
@@ -162,10 +167,16 @@ function deleteHistoryListStorage(newItem: string) {
   }
 }
 const router = useRouter();
-function clickSearchItem(item: TitleInfo) {
-  console.log("点击了搜索结果", item);
+
+interface clickPara {
+  item: string;
+  id: number
+}
+
+function clickSearchItem(config: clickPara) {
+  console.log("点击了搜索结果", config.item);
   updateHistoryListStorage(props.searchText);
-  router.push({ path: `/item/${item.id}` });
+  router.push({ path: `/item/${config.id}` });
   // router.push({path: `/item/${item.id}`});
 }
 
@@ -177,6 +188,8 @@ setTimeout(() => {
 
 // 搜索关键词并渲染搜索结果
 import { debounce } from "lodash"; // 引入防抖函数
+import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
+import { sequenceExpression } from "@babel/types";
 const filteredItems = ref<Array<TitleInfo>>([]);
 
 // 将函数逻辑封装为一个防抖处理的函数
@@ -195,20 +208,28 @@ const debouncedWatchHandler = debounce(
 
     let templist: FuzzySearchRes[] = await getFuzzySearchAns(query);
     dataStore.title.length = 0;
+    FuzzySearchResStore.searchShow.length = 0;
     for (let word of templist) {
-      dataStore.title.push({
-        id: word.indexValue,
-        title: word.title,
-        subtitle: word.description,
-        avatar: `http://www.zhongyoo.com/${word.picUrl}`,
-        fuzzyWord: word.word,
-        isFuzzy: word.isFuzzy
-      });
+      if (word.isFuzzy === false) {
+        dataStore.title.push({
+          id: word.indexValue,
+          title: word.title,
+          subtitle: word.description,
+          avatar: `http://www.zhongyoo.com/${word.picUrl}`,
+          fuzzyWord: word.word,
+          isFuzzy: false,
+        });
+      } else {
+        FuzzySearchResStore.searchShow.push({
+          id: word.indexValue,
+          title: word.title,
+          picurl: `http://www.zhongyoo.com/${word.picUrl}`,
+        });
+      }
     }
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     console.log("加载的标题：", dataStore.title);
-    console.log("strong title", dataStore.strongTitle);
-    console.log("strong subtitle", dataStore.strongSubTitle);
+    console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
     filteredItems.value = dataStore.title;
 
     dataStore.computeStrongRange(query);
@@ -244,25 +265,6 @@ watch(
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
 
-// 异步加载json的静态test数据
-/* async function getAnsJSON(searchWord: string = ""): Promise<TitleInfo[]> {
-  let backupUrl: string =
-    "http://" +
-    import.meta.env.VITE_IP +
-    ":" +
-    import.meta.env.VITE_BACKEND_PORT;
-  //console.log("backupUrl", backupUrl);
-  try {
-    const response = await fetch(backupUrl + "/json");
-    const data = await response.json(); // 假设服务器返回的是一个 TitleInfo 数组
-    //console.log("loaded", data);
-    return data.title; // 返回解析后的数据
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return dataStore.emptytitle; // 发生错误时返回空标题数组
-  }
-} */
-
 interface FuzzySearchRes {
   id: number;
   word: string;
@@ -287,7 +289,7 @@ async function getFuzzySearchAns(
 
     // console.log("loaded 搜索结果！", data);
     // (data as searchResult[]).sort((a, b) => b.similarity - a.similarity); // 降序排序
-    console.log("搜索结果！",url, data);
+    console.log("搜索结果！", url, data);
 
     return data as FuzzySearchRes[];
   } catch (error) {
@@ -306,11 +308,21 @@ async function getFuzzySearchAns(
   height: 25vh;
 }
 .v-list::-webkit-scrollbar {
-  width: 0px;  /* 设置滚动条宽度为0 */
-  background: transparent;  /* 可选：设置背景透明 */
+  width: 0px; /* 设置滚动条宽度为0 */
+  background: transparent; /* 可选：设置背景透明 */
 }
 
 .v-list::-webkit-scrollbar-thumb {
   background: transparent; /* 可选：设置滚动条滑块透明 */
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 1;
+  border-radius: 10px;
+  overflow: hidden;
 }
 </style>
