@@ -12,12 +12,11 @@
 
 <script lang="ts" setup>
 import searchMain from "@/components/search/search-main.vue";
-onMounted(() => { 
-  document.body.style.overflow = "hidden";
-} // 禁止 routerview 滚动
+onMounted(
+  () => {
+    document.body.style.overflow = "hidden";
+  } // 禁止 routerview 滚动
 );
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

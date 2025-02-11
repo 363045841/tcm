@@ -13,17 +13,30 @@
       :key="index"
       :subtitle="item.subtitle"
       :prepend-avatar="item.avatar"
-      @click="clickSearchItem({
-        id: item.id,
-        item: item.title
-      })"
+      @click="
+        clickSearchItem({
+          id: item.id,
+          item: item.title,
+        })
+      "
     >
       <template #title>
         <div style="display: flex; justify-content: space-between; width: 100%">
           <div v-if="item.title.indexOf(searchText) !== -1">
-            <span>{{ item.title.substring(0, item.title.indexOf(searchText)) }}</span>
-            <b>{{ item.title.substring(item.title.indexOf(searchText), item.title.indexOf(searchText) + searchText.length) }}</b>
-            <span>{{ item.title.substring(item.title.indexOf(searchText) + searchText.length) }}</span>
+            <span>{{
+              item.title.substring(0, item.title.indexOf(searchText))
+            }}</span>
+            <b>{{
+              item.title.substring(
+                item.title.indexOf(searchText),
+                item.title.indexOf(searchText) + searchText.length
+              )
+            }}</b>
+            <span>{{
+              item.title.substring(
+                item.title.indexOf(searchText) + searchText.length
+              )
+            }}</span>
           </div>
           <div v-else>{{ item.title }}</div>
           <span v-if="item.isFuzzy">
@@ -36,13 +49,22 @@
 
       <template #subtitle>
         <div v-if="item.subtitle.indexOf(searchText) !== -1">
-          <span>{{ item.subtitle.substring(0, item.subtitle.indexOf(searchText)) }}</span>
-          <b>{{ item.subtitle.substring(item.subtitle.indexOf(searchText), item.subtitle.indexOf(searchText) + searchText.length) }}</b>
-          <span>{{ item.subtitle.substring(item.subtitle.indexOf(searchText) + searchText.length) }}</span>
+          <span>{{
+            item.subtitle.substring(0, item.subtitle.indexOf(searchText))
+          }}</span>
+          <b>{{
+            item.subtitle.substring(
+              item.subtitle.indexOf(searchText),
+              item.subtitle.indexOf(searchText) + searchText.length
+            )
+          }}</b>
+          <span>{{
+            item.subtitle.substring(
+              item.subtitle.indexOf(searchText) + searchText.length
+            )
+          }}</span>
         </div>
         <div v-else>{{ item.subtitle }}</div>
-
-
       </template>
     </v-list-item>
 
@@ -55,15 +77,17 @@
         align-items: center;
       "
     >
-      <span style="margin: 10px;">猜你想搜</span>
+      <span style="margin: 10px">猜你想搜</span>
       <span
         v-for="(item, index) in FuzzySearchResStore.searchShow"
         :key="index"
-        style="margin: 10px;color:rgb(16, 104, 191);"
-        @click="clickSearchItem({
-          id: item.id,
-          item: item.title
-        })"
+        style="margin: 10px; color: rgb(16, 104, 191)"
+        @click="
+          clickSearchItem({
+            id: item.id,
+            item: item.title,
+          })
+        "
       >
         {{ item.title }}
       </span>
@@ -95,7 +119,6 @@
         style="margin: 4px"
         @click:close="deleteHistoryListStorage(item)"
         @click="emit('changeFatherSearchText', item)"
-
         :closable="historyListClosable"
       >
         {{ item }}
@@ -116,7 +139,6 @@ import { FuzzyItem } from "@/stores/searchPage/fuzzySearchRes";
 
 const showStore = useComponentsShowStore();
 const emit = defineEmits(["changeFatherSearchText"]);
-
 
 let historyListClosable = ref<boolean>(false);
 
@@ -170,7 +192,7 @@ const router = useRouter();
 
 interface clickPara {
   item: string;
-  id: number
+  id: number;
 }
 
 function clickSearchItem(config: clickPara) {

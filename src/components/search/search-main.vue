@@ -1,5 +1,8 @@
 <template>
-  <v-container @mouseleave="showStore.mouseOnSearchContainer = false" @mouseover="showStore.mouseOnSearchContainer = true">
+  <v-container
+    @mouseleave="showStore.mouseOnSearchContainer = false"
+    @mouseover="showStore.mouseOnSearchContainer = true"
+  >
     <v-row style="padding-bottom: 0px">
       <!-- search box -->
       <v-col style="padding-left: 0px">
@@ -11,7 +14,7 @@
             rounded
             v-model:model-value="searchText"
             :hide-details="true"
-            @focus="((move = true), (showStore.searchFocus = true))"
+            @focus="(move = true), (showStore.searchFocus = true)"
             @blur="textFieldLoseFocus"
             @input="onInput"
             @compositionstart="isComposing = true"
@@ -67,9 +70,7 @@
     <v-row>
       <v-col style="padding: 0px">
         <searchAns
-
           :searchText="finalizedSearchText"
-
           @changeFatherSearchText="receiveChildSearchText"
         />
         <!-- <searchAns
@@ -94,7 +95,7 @@ function receiveChildSearchText(childSearchText: string) {
 const showStore = useComponentsShowStore();
 
 function textFieldLoseFocus() {
-  if(showStore.mouseOnSearchContainer) showStore.searchFocus = true;
+  if (showStore.mouseOnSearchContainer) showStore.searchFocus = true;
   else showStore.searchFocus = false;
 }
 
@@ -104,8 +105,6 @@ viewportStore.setViewport();
 onMounted(() => {
   viewportStore.setViewport();
 });
-
-
 
 let searchPrefer = ref<string>("全部"); // 搜索偏好选项
 let searchText = ref<string>(""); // 用户输入的搜索内容
@@ -128,7 +127,6 @@ const onCompositionEnd = (event: CompositionEvent) => {
   finalizedSearchText.value = searchText.value;
   console.log("search text", finalizedSearchText.value);
 };
-
 
 /* watch(searchPrefer, () => {
   console.log("search prefer", searchPrefer.value);

@@ -8,14 +8,12 @@ export interface FuzzyItem {
 
 interface State {
   searchShow: FuzzyItem[];
-
 }
 
-export const useComponentsFuzzyShowStore = defineStore('fuzzySearchRes', {
-    state: ():State => ({
-      searchShow: []
-    }),
-    getters: {},
-    actions: {
-    }
-  });
+export const useComponentsFuzzyShowStore = defineStore("fuzzySearchRes", {
+  state: (): State => ({
+    searchShow: [],
+  }),
+  getters: {},
+  actions: {},
+});
