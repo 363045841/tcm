@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
 
 export interface FuzzyItem {
-  id: number;
   title: string;
-  picurl: string;
 }
 
 interface State {

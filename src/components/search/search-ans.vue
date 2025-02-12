@@ -89,7 +89,7 @@
           color: rgb(16, 104, 191);
           white-space: nowrap;
         "
-        @click="clickSearchItem({ id: item.id, item: item.title })"
+        @click="emit('changeFatherSearchText', item.title);"
       >
         {{ item.title }}
       </span>
@@ -216,6 +216,7 @@ setTimeout(() => {
 // 搜索关键词并渲染搜索结果
 import { debounce } from "lodash"; // 引入防抖函数
 import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
+import { interpreterDirective } from "@babel/types";
 
 const filteredItems = ref<Array<TitleInfo>>([]);
 
@@ -233,26 +234,23 @@ const debouncedWatchHandler = debounce(
     }, 500);
     // let templist: TitleInfo[] = await getAnsJSON(val); // 阻塞等待后端返回数据
 
-    let templist: FuzzySearchRes[] = await getFuzzySearchAns(query);
+    let templist: SearchRes = await getFuzzySearchAns(query);
     dataStore.title.length = 0;
     FuzzySearchResStore.searchShow.length = 0;
-    for (let word of templist) {
-      if (word.isFuzzy === false) {
-        dataStore.title.push({
-          id: word.indexValue,
-          title: word.title,
-          subtitle: word.description,
-          avatar: `http://www.zhongyoo.com/${word.picUrl}`,
-          fuzzyWord: word.word,
-          isFuzzy: false,
-        });
-      } else {
-        FuzzySearchResStore.searchShow.push({
-          id: word.indexValue,
-          title: word.title,
-          picurl: `http://www.zhongyoo.com/${word.picUrl}`,
-        });
-      }
+    for (let word of templist.accurate) {
+      dataStore.title.push({
+        id: word.id,
+        title: word.title,
+        subtitle: word.description,
+        avatar: `http://www.zhongyoo.com/${word.picUrl}`,
+        fuzzyWord: word.word,
+        isFuzzy: false,
+      });
+    }
+    for (let word of templist.fuzzy) {
+      FuzzySearchResStore.searchShow.push({
+        title: word,
+      });
     }
     dataStore.title.sort((a, b) => {
       if (a.title === query) {
@@ -263,15 +261,14 @@ const debouncedWatchHandler = debounce(
         return 1;
       }
     });
-    for(let i = 0; i < dataStore.title.length; i++) {
-      if(dataStore.title[i].title === query){
-        dataStore.title.unshift(dataStore.title[i])
-        dataStore.title.splice(i+1, 1)
+    for (let i = 0; i < dataStore.title.length; i++) {
+      if (dataStore.title[i].title === query) {
+        dataStore.title.unshift(dataStore.title[i]);
+        dataStore.title.splice(i + 1, 1);
         break;
       }
     }
-    console.log("长度",dataStore.title.length)
-    
+    console.log("长度", dataStore.title.length);
 
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     console.log("加载的标题：", dataStore.title);
@@ -311,7 +308,12 @@ watch(
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
 
-interface FuzzySearchRes {
+interface SearchRes {
+  accurate: AccurateSearchRes[];
+  fuzzy: string[];
+}
+
+interface AccurateSearchRes {
   id: number;
   word: string;
   indexValue: number;
@@ -327,7 +329,7 @@ async function getFuzzySearchAns(
   url: string = `http://${import.meta.env.VITE_IP}:${
     import.meta.env.VITE_BACKEND_PORT
   }/api/v1/search?wd=`
-): Promise<FuzzySearchRes[]> {
+): Promise<SearchRes> {
   try {
     url = url + searchWord;
     const res = await fetch(url, { method: "GET" });
@@ -335,10 +337,13 @@ async function getFuzzySearchAns(
 
     console.log("搜索结果！", url, data);
 
-    return data as FuzzySearchRes[];
+    return data;
   } catch (error) {
     console.error("Error fetching data:", error);
-    return []; // 如果出现错误，可以返回一个空数组
+    return {
+      accurate: [],
+      fuzzy: []
+    }; // 如果出现错误，可以返回一个空数组
   }
 }
 </script>
