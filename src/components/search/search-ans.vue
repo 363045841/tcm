@@ -268,8 +268,6 @@ const debouncedWatchHandler = debounce(
         break;
       }
     }
-    console.log("长度", dataStore.title.length);
-
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     console.log("加载的标题：", dataStore.title);
     console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
@@ -334,8 +332,6 @@ async function getFuzzySearchAns(
     url = url + searchWord;
     const res = await fetch(url, { method: "GET" });
     const data = await res.json();
-
-    console.log("搜索结果！", url, data);
 
     return data;
   } catch (error) {
