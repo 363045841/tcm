@@ -1,9 +1,9 @@
 <template>
-  <h1>Hello</h1>
+
 </template>
 
 <script setup lang='ts' name=''>
-  console.log('page router load!!')
+import { ref, reactive} from 'vue'
 
 </script>
 <style scoped>

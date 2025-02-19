@@ -1,4 +1,9 @@
 <template>
+  <img
+    :src="`http://www.zhongyoo.com/${chineseMedicineData.pic}`"
+    alt="中药图片"
+    style="max-width: 50vh"
+  /><br />
   <b>相关内容</b>
   <span
     v-for="(item, index) in relation"
@@ -181,6 +186,9 @@ onMounted(async () => {
   await getMedicineInfo(ID);
   relation.value = await getMedicineRelation(ID);
   calcItemRelationInfo(toRaw(relation.value));
+  eventBus.emit("sendRelation", toRaw(relation.value));
+  eventBus.emit("sendMedName", chineseMedicineData.value.tcmName);
+  console.log("发送了数据");
 });
 
 async function getMedicineRelation(id: number): Promise<RelatedInfoFinalRes[]> {
@@ -221,7 +229,7 @@ export interface MedicineData {
   prescription: string;
 }
 
-import { RelatedInfoFinalRes } from "@/pages/item/[id].vue";
+import { type RelatedInfoFinalRes } from "@/pages/item/[id].vue";
 </script>
 <style>
 .underline-on-hover {
