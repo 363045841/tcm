@@ -27,7 +27,7 @@
           </router-link>
         </template>
       </v-app-bar>
-      <router-view class="router-view" :key="RouterViewUUID"></router-view>
+      <router-view class="router-view" :key="RouterViewKey"></router-view>
     </v-main>
   </v-app>
 </template>
@@ -39,17 +39,17 @@ const showStore = useComponentsShowStore();
 
 // 监听事件
 onMounted(() => {
-  eventBus.on('updateUUID', updateUUID);
+  eventBus.on('updateUUID', updateRouterViewKey);
 });
 
 // 组件销毁时移除监听
 onUnmounted(() => {
-  eventBus.off('updateUUID', updateUUID);
+  eventBus.off('updateUUID', updateRouterViewKey);
 });
 
-function updateUUID() {
-  RouterViewUUID.value = crypto.randomUUID();
-  console.log('更新了UUID！',RouterViewUUID.value);
+function updateRouterViewKey() {
+  RouterViewKey.value++;
+  console.log('更新了RouterKey！',RouterViewKey.value);
 }
 
 setTimeout(() => {
@@ -58,7 +58,7 @@ setTimeout(() => {
 
 // 随机页面功能
 let randomNum = ref<number>(Math.floor(Math.random() * 100));
-let RouterViewUUID = ref<string>(crypto.randomUUID());
+let RouterViewKey = ref<number>(0);
 const generateRandomNumber = () => {
   let maxPage: number = 899;
   fetch("http://localhost:3001/api/v1/medinfo/length", { method: "GET" })
@@ -69,8 +69,9 @@ const generateRandomNumber = () => {
     .catch((error) => console.log(error));
 
   randomNum.value = Math.floor(Math.random() * maxPage) + 1;
-  RouterViewUUID.value = crypto.randomUUID();
+  RouterViewKey.value++;
 };
+
 </script>
 
 <style scoped>

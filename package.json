@@ -8,6 +8,7 @@
     "build": "vite build --emptyOutDir"
   },
   "dependencies": {
+    "@antv/g6": "^5.0.43",
     "@mdi/font": "7.4.47",
     "axios": "^1.7.9",
     "core-js": "^3.40.0",

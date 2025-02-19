@@ -134,7 +134,6 @@ async function getMedicineInfo(id: number) {
 async function clickRelation(id: number) {
   // 获取相关药材信息
   await getMedicineInfo(id);
-
   // 数据更新完成后跳转
   await router.push({ path: `/item/${id}` });
   eventBus.emit("updateUUID");
