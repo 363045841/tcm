@@ -1,8 +1,7 @@
 <template>
   <v-row style="width: 60%; margin: 5vh" class="d-flex flex-nowrap">
     <v-col cols="10" style="margin-left: 10vh">
-      
-      <Info @updatePicUrl="handlePicUrl" :relation="relation"></Info>
+      <Info @updatePicUrl="handlePicUrl"></Info>
     </v-col>
     <v-col cols="2">
       <img
@@ -14,41 +13,35 @@
   </v-row>
 </template>
 
-<script setup lang="ts" name="">
+<script setup lang="ts">
 import Info from "@/components/item/info.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 export interface RelatedInfoFinalRes {
   related_tcm_id: number;
   tcmName: string;
 }
 
-let relation = ref<RelatedInfoFinalRes[]>([]);
 const route = useRoute();
-
-const item_id = route.params as { id?: string };
-getMedicineRelattion(Number(item_id.id));
-
-function getMedicineRelattion(id: number) {
-  fetch(
-    `http://${import.meta.env.VITE_IP}:${
-      import.meta.env.VITE_BACKEND_PORT
-    }/api/v1/item-page/relation?id=${id}`
-  )
-    .then((res) => res.json())
-    .then((data: RelatedInfoFinalRes[]) => {
-      console.log("data", data);
-      relation.value = data;
-      console.log("relation", relation);
-    });
-}
-
-
-
+let relation: RelatedInfoFinalRes[] = [];
 const picUrl = ref("");
 
+// 获取相关药材信息
+
+
+// 监听图片 URL 更新
 const handlePicUrl = (url: string) => {
   picUrl.value = url;
 };
+
+// 在组件挂载后调用 API
+onMounted(() => {
+  /* const item_id = route.params as Partial<{ id: string }>; // ✅ 解决类型问题
+  if (item_id.id) {
+    getMedicineRelation(Number(item_id.id));
+  } */
+});
 </script>
+
 <style scoped></style>

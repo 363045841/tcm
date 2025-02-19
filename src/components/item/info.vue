@@ -1,32 +1,59 @@
 <template>
-  <div>
-    <span>相关内容</span>
+  <b>相关内容</b>
+  <span
+    v-for="(item, index) in relation"
+    :key="index"
+    style="margin-left: 10px; color: rgb(16, 104, 191)"
+    @click="clickRelation(item.related_tcm_id)"
+    class="underline-on-hover"
+  >
+    {{ item.tcmName }}
+  </span>
+
+  <!-- 药材详情页主要内容 -->
+  <div
+    v-for="([key, value], index) in Object.entries(propertyMap)"
+    :key="index"
+  >
+    <h2 v-if="index >= 1" style="line-height: 2">{{ value }}</h2>
     <span
-      v-for="(item, index) in relation"
-      :key="index"
-      style="margin-left: 10px; color: rgb(16, 104, 191)"
-      @click="clickRelation(item.related_tcm_id)"
+      v-if="index >= 1 && computedRelationMap.get(key)?.length === 0"
+      style="line-height: 2"
+      >{{ chineseMedicineData[key as keyof typeof chineseMedicineData] }}</span
     >
-      {{ item.tcmName }}
+
+    <span
+      v-else="index >= 1 && computedRelationMap.get(key)?.length !== 0"
+      v-for="[name, posStart, posEnd] in computedRelationMap.get(key)"
+      style="line-height: 2"
+    >
+      <span v-if="index >= 1">{{
+        chineseMedicineData[key as keyof typeof chineseMedicineData].substring(
+          posStart,
+          posEnd
+        )
+      }}</span>
+      <span
+        style="color: rgb(16, 104, 191)"
+        @click="clickRelationLinkText(name)"
+        class="underline-on-hover"
+        >{{ name }}</span
+      >
     </span>
   </div>
-  <div>
-    <div
-      v-for="([key, value], index) in Object.entries(propertyMap)"
-      :key="index"
-    >
-      <h2 v-if="index >= 1" style="line-height: 2">{{ value }}</h2>
-      <p v-if="index >= 1" style="line-height: 2">
-        {{ chineseMedicineData[key as keyof MedicineData] }}
-      </p>
-    </div>
-  </div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { eventBus } from "@/utils/eventBus";
+
+function clickRelationLinkText(name: string) {
+  for (const item of toRaw(relation.value)) {
+    if (item.tcmName === name) {
+      clickRelation(item.related_tcm_id);
+    }
+  }
+}
 
 // 路由参数接口
 interface routerParams {
@@ -72,8 +99,6 @@ const propertyMap = {
   prescription: "配伍与方剂",
 };
 
-// 接收父组件传递的属性
-const props = defineProps(["relation"]);
 const emit = defineEmits(["updatePicUrl"]);
 const router = useRouter();
 const route = useRoute();
@@ -116,31 +141,68 @@ async function clickRelation(id: number) {
 }
 
 // 获取相关信息
-let relationInfo: Map<string, number[]> = new Map();
+
+// let relationInfo: Map<string, Map<string, number>[]> = new Map(); // <key,name,pos>
+let computedRelationMap: Map<
+  string,
+  Array<[string, number, number]>
+> = new Map(); // <key, [name,BeforeTextStartPos,EndTextPos]>
 function calcItemRelationInfo(relation: RelatedInfoFinalRes[]): void {
-  for (let item in relation) {
-    for (let key in propertyMap) {
-      if (key === "pic") continue;
-      let pos =
-        chineseMedicineData.value[key as keyof MedicineData].indexOf(item);
+  // 更新 relationInfo
+  for (const key in propertyMap) {
+    let posMap: Map<string, number> = new Map(); // <name, StartPos>
+    const fieldValue = chineseMedicineData.value[key as keyof MedicineData];
+    for (const item of relation) {
+      let pos = fieldValue.indexOf(item.tcmName);
       if (pos !== -1) {
-        let temp = relationInfo.get(key);
-        if (temp === undefined) temp = [];
-        temp.push(pos);
-        relationInfo.set(key, temp);
+        posMap.set(item.tcmName, pos);
       }
     }
+    // 将超链接按照起始位置排序
+    const sortedArray = Array.from(posMap.entries()).sort(
+      (a, b) => a[1] - b[1]
+    );
+    // WARN: 考虑对相同起始位置做去重取长处理
+    let currentPos = 0;
+    let finalSortedArray: Array<[string, number, number]> = [];
+    for (const [name, pos] of sortedArray) {
+      finalSortedArray.push([name, currentPos, pos]);
+      currentPos = pos + name.length;
+    }
+    finalSortedArray.push(["", currentPos, fieldValue.length]);
+    computedRelationMap.set(key, finalSortedArray);
   }
+  console.log(computedRelationMap);
 }
 
 // 在组件挂载时获取数据
-onMounted(() => {
+let relation = ref<RelatedInfoFinalRes[]>([]);
+onMounted(async () => {
   document.body.style.overflow = "auto"; // 恢复滚动条
-  getMedicineInfo(ID);
-  calcItemRelationInfo(props.relation);
+  await getMedicineInfo(ID);
+  relation.value = await getMedicineRelation(ID);
+  calcItemRelationInfo(toRaw(relation.value));
 });
 
-// 模拟的数据类型
+async function getMedicineRelation(id: number): Promise<RelatedInfoFinalRes[]> {
+  try {
+    const response = await fetch(
+      `http://${import.meta.env.VITE_IP}:${
+        import.meta.env.VITE_BACKEND_PORT
+      }/api/v1/item-page/relation?id=${id}`
+    );
+    let data = await response.json();
+    if (data !== undefined) {
+      return data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("获取相关药材信息失败:", error);
+  }
+  return [];
+}
+
 export interface MedicineData {
   pic: string;
   tcmName: string;
@@ -162,3 +224,12 @@ export interface MedicineData {
 
 import { RelatedInfoFinalRes } from "@/pages/item/[id].vue";
 </script>
+<style>
+.underline-on-hover {
+  cursor: pointer; /* 鼠标悬停时显示手型 */
+}
+
+.underline-on-hover:hover {
+  text-decoration: underline; /* 悬停时显示下划线 */
+}
+</style>
