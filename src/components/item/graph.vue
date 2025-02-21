@@ -35,14 +35,14 @@ onMounted(() => {
     eventBus.on("sendMedName", async (res) => {
       tcmName = res as string;
       console.log("接收到药材名称：", tcmName);
-
+      dataOptionArray.length = 0;
+      linksOptionArray.length = 0;
       // 构造echarts中心
       for (let item of data) {
         dataOptionArray.push({ name: item.tcmName, value: 10 });
         linksOptionArray.push({ source: tcmName, target: item.tcmName });
       }
       // 扩展边缘节点
-
       // 并发请求药材关系数据
       try {
         let response = await Promise.all(
@@ -65,11 +65,11 @@ onMounted(() => {
       }
 
       let dataOptionSet = new Set(dataOptionArray.map((item) => item.name));
+      dataOptionArray.push({ name: tcmName, value: 40 });
       dataOptionArray = Array.from(dataOptionSet).map((name) => ({
         name,
         value: 10,
       }));
-      dataOptionArray.push({ name: tcmName, value: 40 });
 
       if (chartRef.value) {
         chartInstance = echarts.init(chartRef.value);

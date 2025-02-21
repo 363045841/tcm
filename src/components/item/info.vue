@@ -22,7 +22,9 @@
   >
     <h2 v-if="index >= 1" style="line-height: 2">{{ value }}</h2>
     <span
-      v-if="index >= 1 && computedRelationMap.get(key)?.length === 0"
+      v-if="index >= 1 && computedRelationMap.get(key)?.length === 0
+      && chineseMedicineData[key as keyof typeof chineseMedicineData] !== null"
+
       style="line-height: 2"
       >{{ chineseMedicineData[key as keyof typeof chineseMedicineData] }}</span
     >
@@ -157,6 +159,9 @@ function calcItemRelationInfo(relation: RelatedInfoFinalRes[]): void {
     let posMap: Map<string, number> = new Map(); // <name, StartPos>
     const fieldValue = chineseMedicineData.value[key as keyof MedicineData];
     for (const item of relation) {
+      /* if(item === null || item === undefined){
+        continue;
+      } */
       let pos = fieldValue.indexOf(item.tcmName);
       if (pos !== -1) {
         posMap.set(item.tcmName, pos);
