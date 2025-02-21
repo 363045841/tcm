@@ -10,6 +10,7 @@ import { TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { eventBus } from "@/utils/eventBus";
 import { type RelatedInfoFinalRes } from "@/pages/item/[id].vue";
+import { getMedicineRelation } from "@/utils/useGetMedicineRelation";
 
 echarts.use([GraphChart, TooltipComponent, CanvasRenderer]);
 
@@ -31,13 +32,43 @@ onMounted(() => {
   eventBus.on("sendRelation", (res) => {
     console.log("接收到数据：", res);
     data = res as RelatedInfoFinalRes[];
-    eventBus.on("sendMedName", (res) => {
+    eventBus.on("sendMedName", async (res) => {
       tcmName = res as string;
       console.log("接收到药材名称：", tcmName);
+
+      // 构造echarts中心
       for (let item of data) {
         dataOptionArray.push({ name: item.tcmName, value: 10 });
         linksOptionArray.push({ source: tcmName, target: item.tcmName });
       }
+      // 扩展边缘节点
+
+      // 并发请求药材关系数据
+      try {
+        let response = await Promise.all(
+          data.map((item) => getMedicineRelation(item.related_tcm_id))
+        );
+        let index = 0;
+        for (let item of response) {
+          for (let res of item) {
+            console.log(res);
+            dataOptionArray.push({ name: res.tcmName, value: 10 });
+            linksOptionArray.push({
+              source: data[index].tcmName,
+              target: res.tcmName,
+            });
+          }
+          index++;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      let dataOptionSet = new Set(dataOptionArray.map((item) => item.name));
+      dataOptionArray = Array.from(dataOptionSet).map((name) => ({
+        name,
+        value: 10,
+      }));
       dataOptionArray.push({ name: tcmName, value: 40 });
 
       if (chartRef.value) {
@@ -61,7 +92,7 @@ onMounted(() => {
               },
               force: {
                 repulsion: 500,
-                edgeLength: 200,
+                edgeLength: 50,
                 gravity: 0.1,
                 friction: 0.6,
               },
