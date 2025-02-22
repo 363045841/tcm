@@ -24,7 +24,6 @@
     <span
       v-if="index >= 1 && computedRelationMap.get(key)?.length === 0
       && chineseMedicineData[key as keyof typeof chineseMedicineData] !== null"
-
       style="line-height: 2"
       >{{ chineseMedicineData[key as keyof typeof chineseMedicineData] }}</span
     >
@@ -143,7 +142,7 @@ async function clickRelation(id: number) {
   await getMedicineInfo(id);
   // 数据更新完成后跳转
   await router.push({ path: `/item/${id}` });
-  eventBus.emit("updateUUID");
+  eventBus.emit("updateRouterViewKey");
 }
 
 // 获取相关信息
@@ -193,6 +192,10 @@ onMounted(async () => {
   calcItemRelationInfo(toRaw(relation.value));
   eventBus.emit("sendRelation", toRaw(relation.value));
   eventBus.emit("sendMedName", chineseMedicineData.value.tcmName);
+  eventBus.on("clickMedNameGraph",(id: number) => {
+    console.log("收到了图点击!",id);
+    clickRelation(id);
+  })
   console.log("发送了数据");
 });
 

@@ -39,17 +39,17 @@ const showStore = useComponentsShowStore();
 
 // 监听事件
 onMounted(() => {
-  eventBus.on('updateUUID', updateRouterViewKey);
+  eventBus.on('updateRouterViewKey', updateRouterViewKey);
 });
 
 // 组件销毁时移除监听
 onUnmounted(() => {
-  eventBus.off('updateUUID', updateRouterViewKey);
+  eventBus.off('updateRouterViewKey', updateRouterViewKey);
 });
 
 function updateRouterViewKey() {
   RouterViewKey.value++;
-  console.log('更新了RouterKey！',RouterViewKey.value);
+  console.log('更新了RouterKey!',RouterViewKey.value);
 }
 
 setTimeout(() => {

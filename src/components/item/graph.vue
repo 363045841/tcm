@@ -18,6 +18,8 @@ const chartRef = ref(null);
 let chartInstance: echarts.ECharts | null = null;
 let data: RelatedInfoFinalRes[] = {} as RelatedInfoFinalRes[];
 let tcmName: string = "";
+let router = useRouter();
+
 interface dataOption {
   name: string;
   value: number;
@@ -51,7 +53,6 @@ onMounted(() => {
         let index = 0;
         for (let item of response) {
           for (let res of item) {
-            console.log(res);
             dataOptionArray.push({ name: res.tcmName, value: 10 });
             linksOptionArray.push({
               source: data[index].tcmName,
@@ -111,6 +112,40 @@ onMounted(() => {
             },
           ],
         });
+        chartInstance.on("click", (params) => {
+          handleClick(params);
+        });
+        interface IDresponse {
+          id: number;
+        }
+
+        async function handleClick(params: echarts.ECElementEvent) {
+          if (params.dataType === "node") {
+            console.log("点击了节点：", params.data);
+
+            try {
+              const response = await fetch(
+                `http://${import.meta.env.VITE_IP}:${
+                  import.meta.env.VITE_BACKEND_PORT
+                }/api/v1/medinfo/page/name/${(params.data as dataOption).name}`
+              );
+
+              if (!response.ok) {
+                throw new Error(`HTTP 错误！状态码: ${response.status}`);
+              }
+
+              const data: IDresponse = await response.json();
+              console.log("药材ID.json", data.id);
+              eventBus.emit("clickMedNameGraph", data.id);
+              /* router.push({ path: `/item/${data.id}` });
+              eventBus.emit("updateRouterViewKey") */
+            } catch (error) {
+              console.error("获取数据失败：", error);
+            }
+          } else if (params.dataType === "edge") {
+            console.log("点击了边：", params.data);
+          }
+        }
       }
     });
   });
@@ -120,6 +155,8 @@ onBeforeUnmount(() => {
   if (chartInstance) {
     chartInstance.dispose();
   }
+  chartInstance?.dispose();
+  chartInstance = null;
   eventBus.off("sendRelation");
   eventBus.off("sendMedName");
 });

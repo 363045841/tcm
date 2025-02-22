@@ -1,3 +1,10 @@
-import mitt from 'mitt';
+import mitt from "mitt";
 
-export const eventBus = mitt();
+type Events = {
+  sendRelation: any;
+  sendMedName: any;
+  clickMedNameGraph: number; // 这里明确指定事件参数是 number
+  updateRouterViewKey: void;
+};
+
+export const eventBus = mitt<Events>();
