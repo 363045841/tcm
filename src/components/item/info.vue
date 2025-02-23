@@ -192,10 +192,10 @@ onMounted(async () => {
   calcItemRelationInfo(toRaw(relation.value));
   eventBus.emit("sendRelation", toRaw(relation.value));
   eventBus.emit("sendMedName", chineseMedicineData.value.tcmName);
-  eventBus.on("clickMedNameGraph",(id: number) => {
-    console.log("收到了图点击!",id);
+  eventBus.on("clickMedNameGraph", (id: number) => {
+    console.log("收到了图点击!", id);
     clickRelation(id);
-  })
+  });
   console.log("发送了数据");
 });
 

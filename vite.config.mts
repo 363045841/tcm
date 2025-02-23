@@ -69,7 +69,7 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  base: "./",
+  base: "/",
   build: {
     outDir: process.env.VITE_OUT_PATH,
   },

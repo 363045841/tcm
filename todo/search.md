@@ -9,4 +9,5 @@ TODO 搜索结果匹配加粗
     后端应当返回匹配到的数据以及相应的截取map，然后根据map来渲染搜索结果
 TODO 搜索结果跳转
 BUG 路由跳转后的搜索结果图渲染错误
-PREF graph 去重逻辑游优化
+PREF graph 去重逻辑优化
+BUG 天冬等Graph节点颜色渲染错误

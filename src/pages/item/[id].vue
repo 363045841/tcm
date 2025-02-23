@@ -1,16 +1,15 @@
 <template>
-  <v-row style="width: 90%; margin: 5vh" class="d-flex flex-nowrap">
+  <v-row style="width: 90%;" class="d-flex flex-nowrap">
     <v-col cols="6" style="margin-left: 10vh">
       <Info @updatePicUrl="handlePicUrl"></Info>
     </v-col>
-    <v-col cols="6">
-      <graph></graph>
+    <v-col cols="6" style="height: 80vh;">
+      <graph style="margin-top: 20px;margin-right: 20px;"></graph>
       <!-- <img
         :src="`http://www.zhongyoo.com/${picUrl}`"
         alt="中药图片"
         style="max-width: 50vh"
       /> -->
-      
     </v-col>
   </v-row>
 </template>
