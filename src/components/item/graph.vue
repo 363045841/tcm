@@ -81,12 +81,16 @@ onMounted(() => {
       }
 
       let dataOptionSet = new Set(dataOptionArray.map((item) => item.name));
+      if(dataOptionSet.has(tcmName)) {
+        dataOptionSet.delete(tcmName);
+      }
 
       dataOptionArray = Array.from(dataOptionSet).map((name) => ({
         name,
         value: 10,
-        category: (dataOptionSet.has(tcmName) ? categoryMap.get(name) : 0) || 0,
+        category: (dataOptionSet.has(name) ? categoryMap.get(name) : 3) as number
       }));
+      dataOptionArray.push({ name: tcmName, value: 10, category: 0 });
 
       if (chartRef.value) {
         echarts.use([TitleComponent]);
@@ -96,7 +100,7 @@ onMounted(() => {
           tooltip: {},
           title: {
             text: "词条关联", // 设置主标题文本
-            // subtext: "副标题", // 设置副标题文本
+            subtext: "基于zhongyoo.com数据", // 设置副标题文本
             left: "center", // 设置主标题的水平位置：'left', 'center', 'right'
             top: "0", // 设置主标题的垂直位置：可以是像素值（'20'），也可以是百分比（'10%'）
             textStyle: {
