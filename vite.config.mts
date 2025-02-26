@@ -13,6 +13,7 @@ import { fileURLToPath, URL } from "node:url";
 import { configDotenv } from "dotenv";
 
 import * as dotenv from "dotenv";
+import vueJsx from "@vitejs/plugin-vue-jsx";
 dotenv.config();
 
 // https://vitejs.dev/config/
@@ -48,6 +49,7 @@ export default defineConfig({
         configFile: "src/styles/settings.scss",
       },
     }),
+    vueJsx(),
     Fonts({
       google: {
         families: [
