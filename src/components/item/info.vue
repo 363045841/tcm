@@ -116,6 +116,7 @@ const sendPicUrl = (url: string) => {
 
 const ID = (route.params as routerParams).id;
 
+const infoStore = useInfoStore();
 // 获取中药信息
 async function getMedicineInfo(id: number) {
   try {
@@ -125,11 +126,14 @@ async function getMedicineInfo(id: number) {
       }/api/v1/medinfo/page/${id}`
     );
     const data = await response.json();
+    infoStore.tcmName = data.tcmName;
+    console.log("更新了名字！",infoStore.tcmName);
 
     // 更新响应式数据
     for (const key in chineseMedicineData.value) {
       chineseMedicineData.value[key as keyof MedicineData] = data[key];
     }
+
     sendPicUrl(data.pic);
   } catch (error) {
     console.error("Fetch 错误:", error);
@@ -238,6 +242,7 @@ export interface MedicineData {
 }
 
 import { type RelatedInfoFinalRes } from "@/pages/item/[id].vue";
+import { useInfoStore } from "@/stores/infoPage/info";
 </script>
 <style>
 .underline-on-hover {

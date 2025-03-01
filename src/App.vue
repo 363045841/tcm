@@ -25,6 +25,9 @@
           >
             随机页面
           </router-link>
+          <router-link class="nav-link" to="/chat" style="font-size: large">
+            证型判断AI助手
+          </router-link>
         </template>
       </v-app-bar>
       <router-view class="router-view" :key="RouterViewKey"></router-view>
