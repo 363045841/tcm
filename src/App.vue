@@ -10,11 +10,11 @@
           <router-link
             class="nav-link"
             to="/"
-            style="margin-left: 5vh; font-size: large"
+            style="margin-left: 5vh"
           >
             首页
           </router-link>
-          <router-link class="nav-link" to="/list" style="font-size: large">
+          <router-link class="nav-link" to="/list">
             全部
           </router-link>
           <router-link
@@ -28,6 +28,7 @@
           <router-link class="nav-link" to="/chat" style="font-size: large">
             证型判断AI助手
           </router-link>
+          <router-link class="nav-link" to="/datamine">组方数据挖掘</router-link>
         </template>
       </v-app-bar>
       <router-view class="router-view" :key="RouterViewKey"></router-view>

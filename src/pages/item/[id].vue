@@ -10,11 +10,12 @@
         alt="中药图片"
         style="max-width: 50vh"
       /> -->
-       <v-table style="width: 70%; margin: auto; margin-bottom: 40px;">
+      <list :items="items"></list>
+      <!-- <v-table style="width: 70%; margin: auto; margin-bottom: 40px">
         <thead>
           <tr>
-            <th class="text-left" style="width: 30%;"><b>项目</b></th>
-            <th class="text-left"><b>数据来自ETCM2.0</b></th>
+            <th class="text-left" style="width: 30%"><b>项目</b></th>
+            <th class="text-left"><b>数据来自&nbsp;ETCM2.0</b></th>
           </tr>
         </thead>
         <tbody>
@@ -26,7 +27,7 @@
             <td>{{ value }}</td>
           </tr>
         </tbody>
-      </v-table>
+      </v-table> -->
     </v-col>
   </v-row>
 </template>
@@ -35,10 +36,9 @@
 import Info from "@/components/item/info.vue";
 import { ref, onMounted } from "vue";
 import graph from "@/components/item/graph.vue";
-import { eventBus } from "@/utils/eventBus";
 import { useInfoStore } from "@/stores/infoPage/info";
-import { ItemStyleMixin } from "echarts/types/src/model/mixin/itemStyle.js";
-import { configConsumerProps } from "ant-design-vue/es/config-provider";
+import list from "@/components/item/list.vue";
+import { ETCMData, useGetETCMData } from "@/utils/useGetETCMdata";
 
 export interface RelatedInfoFinalRes {
   related_tcm_id: number;
@@ -47,7 +47,7 @@ export interface RelatedInfoFinalRes {
 
 const picUrl = ref("");
 
-const items = ref({
+const items = ref<ETCMData>({
   药材名: "",
   药材拉丁名: "",
   药材英文名: "",
@@ -125,22 +125,15 @@ const chineseToEnglishMap = new Map([
   ["相似中药材名", "similarHerb"],
   ["相似中药材值", "similarHerbNumber"],
   ["相似基因名", "similarGene"],
-  ["相似基因值", "similarGeneNumber"]
+  ["相似基因值", "similarGeneNumber"],
 ]);
 
 watch(
   () => infoStore.tcmName,
   async (newVal) => {
-    console.log("发现了更新！",newVal);
+    console.log("发现了更新！", newVal);
     if (newVal !== "") {
-      const etcmData: HerbFetchInfo = await geEtcmData(newVal);
-      let etcmDataArray = Object.values(etcmData);
-      etcmDataArray.shift();
-      console.log(etcmDataArray);
-      let i = 0;
-      for (const key of chineseToEnglishMap.keys()) {
-        items.value[key as keyof typeof items.value] = etcmDataArray[i++];
-      }
+      items.value = await useGetETCMData(newVal);
       infoStore.tcmName = "";
     }
   }

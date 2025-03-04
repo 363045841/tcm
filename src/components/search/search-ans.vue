@@ -89,7 +89,7 @@
           color: rgb(16, 104, 191);
           white-space: nowrap;
         "
-        @click="emit('changeFatherSearchText', item.title);"
+        @click="emit('changeFatherSearchText', item.title)"
       >
         {{ item.title }}
       </span>
@@ -217,6 +217,7 @@ setTimeout(() => {
 import { debounce } from "lodash"; // 引入防抖函数
 import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
 import { interpreterDirective } from "@babel/types";
+import { fa } from "vuetify/locale";
 
 const filteredItems = ref<Array<TitleInfo>>([]);
 
@@ -252,6 +253,26 @@ const debouncedWatchHandler = debounce(
         title: word,
       });
     }
+    for (let word of templist.ETCM){
+      dataStore.title.push({
+        id: word.id,
+        title: word.recipeName,
+        subtitle: word.prescriptionIngredients,
+        avatar: '',
+        fuzzyWord: '',
+        isFuzzy: false,
+      })
+    }
+    for(let word of templist.ETCMHerbs) {
+      dataStore.title.push({
+        id: word.id,
+        title: word.name,
+        subtitle: word.nature,
+        avatar: '',
+        fuzzyWord: '',
+        isFuzzy: false,
+      })
+    }
     dataStore.title.sort((a, b) => {
       if (a.title === query) {
         return -1;
@@ -268,9 +289,11 @@ const debouncedWatchHandler = debounce(
         break;
       }
     }
+
+
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
-    console.log("加载的标题：", dataStore.title);
-    console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
+    // console.log("加载的标题：", dataStore.title);
+    // console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
     filteredItems.value = dataStore.title;
 
     dataStore.computeStrongRange(query);
@@ -306,9 +329,24 @@ watch(
   { immediate: true } // 初始立即执行一次，确保初始值能正确显示
 );
 
+interface ETCMRes {
+  id: number;
+  recipeName: string;
+  prescriptionIngredients: string;
+}
+
+interface ETCMHerbsRes {
+  id: number;
+  name: string;
+  nature: string;
+}
+
+// 搜索结果返回类型
 interface SearchRes {
   accurate: AccurateSearchRes[];
   fuzzy: string[];
+  ETCM: ETCMRes[]; // 古籍方剂匹配结果
+  ETCMHerbs: ETCMHerbsRes[];
 }
 
 interface AccurateSearchRes {
@@ -338,7 +376,9 @@ async function getFuzzySearchAns(
     console.error("Error fetching data:", error);
     return {
       accurate: [],
-      fuzzy: []
+      fuzzy: [],
+      ETCM: [],
+      ETCMHerbs: []
     }; // 如果出现错误，可以返回一个空数组
   }
 }
