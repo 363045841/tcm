@@ -3,8 +3,8 @@
 </template>
 
 <script setup lang="ts" name="">
-import { ref, reactive } from "vue";
-import list from "@/components/item/list.vue";
+import { ref } from "vue";
+import etcmList from "@/components/item/etcmList.vue";
 import { useGetETCMData } from "@/utils/useGetETCMdata";
 
 interface PageParams {

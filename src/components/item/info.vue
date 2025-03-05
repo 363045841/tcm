@@ -1,9 +1,18 @@
 <template>
-  <img
-    :src="`http://www.zhongyoo.com/${chineseMedicineData.pic}`"
-    alt="中药图片"
-    style="max-width: 50vh"
-  /><br />
+  <div>
+    <img
+      :src="`http://www.zhongyoo.com/${chineseMedicineData.pic}`"
+      alt="中药图片"
+      style="
+        max-width: 50vh;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    />
+  </div>
   <b>相关内容</b>
   <span
     v-for="(item, index) in relation"
@@ -127,7 +136,7 @@ async function getMedicineInfo(id: number) {
     );
     const data = await response.json();
     infoStore.tcmName = data.tcmName;
-    console.log("更新了名字！",infoStore.tcmName);
+    console.log("更新了名字！", infoStore.tcmName);
 
     // 更新响应式数据
     for (const key in chineseMedicineData.value) {

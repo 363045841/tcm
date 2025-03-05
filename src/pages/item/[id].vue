@@ -10,7 +10,7 @@
         alt="中药图片"
         style="max-width: 50vh"
       /> -->
-      <list :items="items"></list>
+      <etcmList :items="items"></etcmList>
       <!-- <v-table style="width: 70%; margin: auto; margin-bottom: 40px">
         <thead>
           <tr>
@@ -37,7 +37,7 @@ import Info from "@/components/item/info.vue";
 import { ref, onMounted } from "vue";
 import graph from "@/components/item/graph.vue";
 import { useInfoStore } from "@/stores/infoPage/info";
-import list from "@/components/item/list.vue";
+import etcmList from "@/components/item/etcmList.vue";
 import { ETCMData, useGetETCMData } from "@/utils/useGetETCMdata";
 
 export interface RelatedInfoFinalRes {
@@ -75,59 +75,6 @@ const items = ref<ETCMData>({
 
 const infoStore = useInfoStore();
 
-interface HerbFetchInfo {
-  herbId: string;
-  herbName: string;
-  latinName: string;
-  englishName: string;
-  family: string;
-  origin: string;
-  collectionTime: string;
-  usedPart: string;
-  category: string;
-  nature: string;
-  taste: string;
-  meridian: string;
-  efficacy: string;
-  appearance: string;
-  specification: string;
-  dbCrossRef: string;
-  component: string;
-  upperLimit: string;
-  lowerLimit: string;
-  unit: string;
-  similarHerb: string;
-  similarHerbNumber: string;
-  similarGene: string;
-  similarGeneNumber: string;
-}
-
-const chineseToEnglishMap = new Map([
-  ["药材名", "herbName"],
-  ["药材拉丁名", "latinName"],
-  ["药材英文名", "englishName"],
-  ["科", "family"],
-  ["产地", "origin"],
-  ["采集时间", "collectionTime"],
-  ["药用部位", "usedPart"],
-  ["中药材类别(按功效划分)", "category"],
-  ["性", "nature"],
-  ["味", "taste"],
-  ["归经", "meridian"],
-  ["功效", "efficacy"],
-  ["性状", "appearance"],
-  ["规格", "specification"],
-  ["数据库交叉检索", "dbCrossRef"],
-  ["成分", "component"],
-  ["上限", "upperLimit"],
-  ["下限", "lowerLimit"],
-  ["单位", "unit"],
-  ["相似中药材名", "similarHerb"],
-  ["相似中药材值", "similarHerbNumber"],
-  ["相似基因名", "similarGene"],
-  ["相似基因值", "similarGeneNumber"],
-]);
-
 watch(
   () => infoStore.tcmName,
   async (newVal) => {
@@ -138,15 +85,6 @@ watch(
     }
   }
 );
-
-async function geEtcmData(name: string) {
-  let temp = await fetch(
-    `http://${import.meta.env.VITE_IP}:${
-      import.meta.env.VITE_BACKEND_PORT
-    }/api/v1/etcm/${name}`
-  ).then((res) => res.json());
-  return temp;
-}
 
 /* let etcmData = await  */
 
