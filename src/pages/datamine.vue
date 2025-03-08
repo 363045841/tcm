@@ -44,6 +44,11 @@
         <radar-chart :item="tasteItem" title="配伍药材六味统计"></radar-chart>
       </v-col>
     </v-row>
+    <v-row justify="center">
+      <v-col cols="6" v-if="functionCountItem.length > 0">
+        <pie-chart :item="functionCountItem" :limit="10" title="配伍药材功效统计"></pie-chart>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -77,8 +82,8 @@ interface tasteCount {
   count: number;
 }
 interface functionCount {
-  efficacy: string;
-  // count: number;
+  name: string;
+  count: number;
 }
 
 interface searchRes {
@@ -91,6 +96,7 @@ interface searchRes {
 // radarProps
 let natureItem = ref<natureCount[]>([]);
 let tasteItem = ref<tasteCount[]>([]);
+let functionCountItem = ref<functionCount[]>([]);
 
 async function searchHerbs(query: string) {
   if (!query) return;
@@ -111,7 +117,8 @@ async function searchHerbs(query: string) {
     herbsCount.value = response.count;
     natureItem.value = response.natureCount;
     tasteItem.value = response.tasteCount;
-    console.log(herbsCount.value);
+    functionCountItem.value = response.functionCount;
+    console.log(functionCountItem.value);
   } catch (error) {
     console.error("请求失败", error);
   }
