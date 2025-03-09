@@ -217,7 +217,7 @@ const HelloWorld = defineComponent({
           conversation_id: string;
         }
         let conversationInfo: createRes = await fetch(
-          `http://${import.meta.env.VITE_IP}:${
+          `${import.meta.env.VITE_IP}:${
             import.meta.env.VITE_BACKEND_PORT
           }/api/v1/aimessage/create`,
           {
@@ -237,7 +237,7 @@ const HelloWorld = defineComponent({
           jibing: string;
         }
         let res = await fetch(
-          `http://${import.meta.env.VITE_IP}:${
+          `${import.meta.env.VITE_IP}:${
             import.meta.env.VITE_BACKEND_PORT
           }/api/v1/aimessage/chat`,
           {

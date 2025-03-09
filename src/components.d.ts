@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BarChart: typeof import('./components/mine/barChart.vue')['default']
     EtcmList: typeof import('./components/item/etcmList.vue')['default']
     Graph: typeof import('./components/item/graph.vue')['default']
     Info: typeof import('./components/item/info.vue')['default']

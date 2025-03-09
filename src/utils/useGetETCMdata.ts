@@ -78,7 +78,7 @@ export async function useGetETCMData(name: string) {
   ]);
 
   let res = await fetch(
-    `http://${import.meta.env.VITE_IP}:${
+    `${import.meta.env.VITE_IP}:${
       import.meta.env.VITE_BACKEND_PORT
     }/api/v1/etcm/${name}`
   ).then((res) => res.json());

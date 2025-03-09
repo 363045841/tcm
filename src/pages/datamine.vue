@@ -103,7 +103,7 @@ async function searchHerbs(query: string) {
 
   try {
     const response: searchRes = await fetch(
-      `http://${import.meta.env.VITE_IP}:${
+      `${import.meta.env.VITE_IP}:${
         import.meta.env.VITE_BACKEND_PORT
       }/api/v1/etcm/mineCount/${query}`
     )
