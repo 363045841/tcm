@@ -243,7 +243,7 @@ const debouncedWatchHandler = debounce(
         id: word.id,
         title: word.title,
         subtitle: word.description,
-        avatar: `http://www.zhongyoo.com/${word.picUrl}`,
+        avatar: `http://www.zhongyoo.com${word.picUrl}`,
         fuzzyWord: word.word,
         isFuzzy: false,
       });

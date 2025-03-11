@@ -100,7 +100,7 @@ onMounted(() => {
           tooltip: {},
           title: {
             text: "词条关联", // 设置主标题文本
-            subtext: "基于zhongyoo.com数据", // 设置副标题文本
+            subtext: "基于 zhongyoo.com 数据", // 设置副标题文本
             left: "center", // 设置主标题的水平位置：'left', 'center', 'right'
             top: "0", // 设置主标题的垂直位置：可以是像素值（'20'），也可以是百分比（'10%'）
             textStyle: {

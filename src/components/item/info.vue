@@ -1,7 +1,7 @@
 <template>
   <div>
     <img
-      :src="`http://www.zhongyoo.com/${chineseMedicineData.pic}`"
+      :src="`http://www.zhongyoo.com${chineseMedicineData.pic}`"
       alt="中药图片"
       style="
         max-width: 50vh;

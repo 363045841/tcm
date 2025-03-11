@@ -33,7 +33,7 @@
             height="16vh"
           ></v-img>
 
-          <v-card-text style="height: 9vh;">
+          <v-card-text style="height: 9vh">
             <h3>{{ card.name }}</h3>
             <p>{{ card.detail }}</p>
           </v-card-text>
@@ -42,7 +42,7 @@
     </v-row>
   </v-container>
   <input ref="testDOM" />
-  
+
   <v-pagination
     :length="screenInfo.paginLength"
     class="fixed-pagination"
@@ -80,7 +80,7 @@ let list = reactive<tcm[]>([
     name: "鹿茸",
     detail: "鹿茸是补气养生的佳品",
     picurl:
-      "http://www.zhongyoo.com//uploads/allimg/140302/1-1403021110535M.jpg",
+      "http://www.zhongyoo.com/uploads/allimg/140302/1-1403021110535M.jpg",
   },
   { name: "鹿鞭1", detail: "鹿鞭是补气养生的佳品" },
   { name: "鹿胎2", detail: "鹿胎是补气养生的佳品" },
@@ -116,34 +116,51 @@ watch(page, (val) => {
 });
 
 function updateScreenInfo() {
-  console.log("update",viewPortStore.isDesktop,viewPortStore.isTablet,viewPortStore.isMobile)
-  if(viewPortStore.isDesktop) {
+  console.log(
+    "update",
+    viewPortStore.isDesktop,
+    viewPortStore.isTablet,
+    viewPortStore.isMobile
+  );
+  if (viewPortStore.isDesktop) {
     screenInfo.width = 6;
-  } else if(viewPortStore.isTablet) {
+  } else if (viewPortStore.isTablet) {
     screenInfo.width = 4;
   } else {
     screenInfo.width = 2;
   }
-  screenInfo.width = (viewPortStore.isDesktop) ? 6 : viewPortStore.isTablet ? 4 : 2;
+  screenInfo.width = viewPortStore.isDesktop
+    ? 6
+    : viewPortStore.isTablet
+    ? 4
+    : 2;
   const viewportHeight = window.innerHeight - 65 - 64 - 12;
-  console.log("viewportHeight", viewportHeight)
+  console.log("viewportHeight", viewportHeight);
   //const containerHeight = container.value?.$el.clientHeight;
-  console.log("each height", (25 * 0.01 * window.innerHeight + 24) + "px")
-  screenInfo.height = Math.floor(viewportHeight / (16 * 0.01 * window.innerHeight + 24)) - 1;
-  screenInfo.showBegin = (page.value - 1) * (screenInfo.width * screenInfo.height)
-  screenInfo.showEnd = screenInfo.showBegin + screenInfo.width * screenInfo.height;
-  if(screenInfo.showEnd > list.length) screenInfo.showEnd = list.length;
-  screenInfo.paginLength = Math.ceil(list.length / (screenInfo.width * screenInfo.height));
-  console.log(screenInfo)
+  console.log("each height", 25 * 0.01 * window.innerHeight + 24 + "px");
+  screenInfo.height =
+    Math.floor(viewportHeight / (16 * 0.01 * window.innerHeight + 24)) - 1;
+  screenInfo.showBegin =
+    (page.value - 1) * (screenInfo.width * screenInfo.height);
+  screenInfo.showEnd =
+    screenInfo.showBegin + screenInfo.width * screenInfo.height;
+  if (screenInfo.showEnd > list.length) screenInfo.showEnd = list.length;
+  screenInfo.paginLength = Math.ceil(
+    list.length / (screenInfo.width * screenInfo.height)
+  );
+  console.log(screenInfo);
 }
 
 onMounted(() => {
   document.body.style.overflow = "hidden";
   viewPortStore.setViewport();
-  console.log("state",viewPortStore.$state)
+  console.log("state", viewPortStore.$state);
   updateScreenInfo();
-  screenInfo.paginTotalVisible = useDisplay().xs.value ? 3 : useDisplay().sm.value ? 5 : 7;
-  
+  screenInfo.paginTotalVisible = useDisplay().xs.value
+    ? 3
+    : useDisplay().sm.value
+    ? 5
+    : 7;
 });
 
 let showCardArray = computed(() => {
@@ -157,8 +174,6 @@ interface tcm {
   detail: string;
   picurl?: string;
 }
-
-
 
 // 拿DOM测试，如果图片大小不一致再考虑
 /* let picSize = {
