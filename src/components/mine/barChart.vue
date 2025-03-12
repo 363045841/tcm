@@ -30,7 +30,7 @@
       const option = {
         title: {
           text: props.title, // 图表标题
-          left: "center", // 标题居中
+          left: "left", // 标题居中
           textStyle: {
             fontSize: 15,
           },

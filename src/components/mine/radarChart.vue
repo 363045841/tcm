@@ -17,6 +17,11 @@ let props = defineProps({
 });
 
 let dataOptions = props.item ? props.item.map((item) => item.count) : [];
+/* if(dataOptions.length > 0){
+  const lastThree = dataOptions.splice(-3);
+  const middleIndex = Math.floor(dataOptions.length / 2);
+  dataOptions.splice(middleIndex, 0, ...lastThree);
+} */
 let maxData = Math.max(...dataOptions);
 
 let indicatorOptions = props.item

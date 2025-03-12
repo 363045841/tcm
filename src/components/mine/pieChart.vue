@@ -12,16 +12,31 @@ interface Item {
 }
 
 // 定义 props
-let props = defineProps({
-  item: Array<Item>, // 数据项
-  title: String, // 图表标题
-  limit: Number,
-});
-
+const props = withDefaults(
+  defineProps<{
+    item: Array<Item>; // 数据项
+    title: string; // 图表标题
+    limit: number;
+  }>(),
+  {
+    item: () => [], // 默认值是一个空数组
+    title: "默认标题", // 默认值是一个字符串
+    limit: 3, // 默认值是一个数字
+  }
+);
 // 动态生成饼图数据
+let maxCount = Math.max(...props.item.map((i) => i.count));
+
+const defaultLimit = 10;
+let realLimit = 0;
+if (maxCount <= defaultLimit) {
+  realLimit = 0;
+} else {
+  realLimit = props.limit;
+}
 let pieData = props.item
   ? props.item.map((item) => {
-      if (item.count > (props.limit ?? 3)) {
+      if (item.count > realLimit) {
         return { value: item.count, name: item.name };
       }
     })
@@ -48,7 +63,8 @@ onMounted(() => {
       },
       legend: {
         orient: "vertical", // 图例垂直排列
-        left: "right", // 图例位置
+        left: "left", // 图例靠左
+        bottom: "0", // 图例放在底部
       },
       series: [
         {
