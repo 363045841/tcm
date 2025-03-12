@@ -67,6 +67,7 @@
         <bar-chart
           :item="functionCountItem"
           title="配伍药材功效统计"
+          :limit="15"
         ></bar-chart>
       </v-col>
     </v-row>
@@ -87,6 +88,9 @@
       </v-col>
     </v-row>
   </v-container>
+  <v-snackbar v-model="isSearching">
+    数据量较大时，Apriori关联规则计算需要5-10秒，请耐心等待...
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
