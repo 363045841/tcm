@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import * as echarts from "echarts";
 
 interface Item {
@@ -12,68 +12,86 @@ interface Item {
 }
 
 let props = withDefaults(
-  defineProps<{ item: Array<Item>; title: string; limit: number }>(),
+  defineProps<{
+    item: Array<Item>;
+    title: string;
+    limit: number;
+  }>(),
   {
     item: () => [],
     title: "",
-    limit: 15 // 注意这个限制的是展示的数量
+    limit: 15,
   }
 );
 
-let realLimit = computed(() => {
+const chart = ref<HTMLElement | null>(null);
+let myChart: echarts.ECharts | null = null;
+
+// 计算实际限制的数量
+const realLimit = computed(() => {
   return props.item.length > props.limit ? props.limit : props.item.length;
-})
-
-
+});
 
 // 提取数据和名称
-let dataOptions = props.item ? props.item.map((item) => item.count) : [];
-let nameOptions = props.item ? props.item.map((item) => item.name) : [];
+const dataOptions = computed(() =>
+  props.item.map((item) => item.count).slice(0, realLimit.value)
+);
+const nameOptions = computed(() =>
+  props.item.map((item) => item.name).slice(0, realLimit.value)
+);
 
-const chart = ref<HTMLElement | null>(null);
-
+// 初始化图表
 onMounted(() => {
   if (chart.value) {
-    const myChart = echarts.init(chart.value);
+    myChart = echarts.init(chart.value, null, { renderer: "svg" });
+    updateChart();
+  }
+});
 
-    // 配置项
+// 更新图表的函数
+function updateChart() {
+  if (myChart) {
     const option = {
       title: {
-        text: props.title, // 图表标题
-        left: "left", // 标题居中
+        text: props.title,
+        left: "left",
         textStyle: {
           fontSize: 15,
         },
       },
       tooltip: {
-        trigger: "axis", // 提示框触发方式：'axis' 表示坐标轴触发
+        trigger: "axis",
       },
       xAxis: {
-        type: "category", // 类目轴
-        data: nameOptions.slice(0,realLimit.value), // X 轴显示的类别名称
+        type: "category",
+        data: nameOptions.value,
         axisLabel: {
-          rotate: 45, // 如果名称过长，可以旋转标签
+          rotate: 45,
         },
       },
       yAxis: {
-        type: "value", // 数值轴
+        type: "value",
       },
       series: [
         {
-          data: dataOptions.slice(0,realLimit.value), // 数据值
-          type: "bar", // 条形图类型
-          barWidth: "50%", // 设置柱子宽度
-          /*  itemStyle: {
-            color: "#3949AB", // 柱子颜色
-          }, */
+          data: dataOptions.value,
+          type: "bar",
+          barWidth: "50%",
         },
       ],
     };
-
-    // 设置配置项并渲染图表
     myChart.setOption(option);
   }
-});
+}
+
+// 监听 props 的变化并更新图表
+watch(
+  () => [props.item, props.title, props.limit],
+  () => {
+    updateChart();
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped></style>

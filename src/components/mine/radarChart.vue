@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import * as echarts from "echarts";
 
 interface Item {
@@ -11,75 +11,85 @@ interface Item {
   count: number;
 }
 
-let props = defineProps({
+const props = defineProps({
   item: Array<Item>,
   title: String,
 });
 
-let dataOptions = props.item ? props.item.map((item) => item.count) : [];
-/* if(dataOptions.length > 0){
-  const lastThree = dataOptions.splice(-3);
-  const middleIndex = Math.floor(dataOptions.length / 2);
-  dataOptions.splice(middleIndex, 0, ...lastThree);
-} */
-let maxData = Math.max(...dataOptions);
-
-let indicatorOptions = props.item
-  ? props.item.map((item) => {
-      return {
-        name: item.name,
-        max: maxData,
-      };
-    })
-  : [];
-
 const chart = ref<HTMLElement | null>(null);
 
+const dataOptions = computed(() => {
+  return props.item ? props.item.map((item) => item.count) : [];
+});
+
+const indicatorOptions = computed(() => {
+  const maxData = Math.max(...dataOptions.value);
+  return props.item
+    ? props.item.map((item) => ({
+        name: item.name,
+        max: maxData,
+      }))
+    : [];
+});
+
 onMounted(() => {
-  console.log(dataOptions);
   if (chart.value) {
-    const myChart = echarts.init(chart.value);
-
-    // 配置项
-    const option = {
-      title: {
-        text: props.title,
-        left: "left",
-        textStyle: {
-          fontSize: 15
-        },
-      },
-      tooltip: {},
-      radar: {
-        // 定义雷达图的指示器（维度）
-        indicator: indicatorOptions, // 使用传入的指示器配置
-        shape: "circle", // 雷达图形状：'polygon' 或 'circle'
-        splitNumber: indicatorOptions.length, // 分割段数
-        axisName: {
-          color: "#333", // 轴名称的颜色
-        },
-      },
-      series: [
-        {
-          type: "radar",
-          data: [
-            {
-              value: dataOptions,
-              name: props.title,
-
-            },
-          ],
-          areaStyle: {
-            opacity: 0.3, // 填充区域的透明度
-          },
-        },
-      ],
-    };
-
-    // 设置配置项并渲染图表
-    myChart.setOption(option);
+    const myChart = echarts.init(chart.value, null, {
+      renderer: 'svg', // 使用 SVG 渲染模式
+    });
+    updateChart(myChart);
   }
 });
+
+function updateChart(myChart: echarts.ECharts) {
+  const option = {
+    title: {
+      text: props.title,
+      left: "left",
+      textStyle: {
+        fontSize: 15,
+      },
+    },
+    tooltip: {},
+    radar: {
+      indicator: indicatorOptions.value,
+      shape: "circle",
+      splitNumber: indicatorOptions.value.length,
+      axisName: {
+        color: "#333",
+      },
+    },
+    series: [
+      {
+        type: "radar",
+        data: [
+          {
+            value: dataOptions.value,
+            name: props.title,
+          },
+        ],
+        areaStyle: {
+          opacity: 0.3,
+        },
+      },
+    ],
+  };
+
+  myChart.setOption(option);
+}
+
+watch(
+  () => props.item,
+  (newItem) => {
+    if (chart.value && newItem) {
+      const myChart = echarts.getInstanceByDom(chart.value);
+      if (myChart) {
+        updateChart(myChart);
+      }
+    }
+  },
+  { deep: false }
+);
 </script>
 
 <style scoped></style>

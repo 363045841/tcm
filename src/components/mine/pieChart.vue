@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import * as echarts from "echarts";
 
 interface Item {
@@ -24,57 +24,63 @@ const props = withDefaults(
     limit: 3, // 默认值是一个数字
   }
 );
-// 动态生成饼图数据
-let maxCount = Math.max(...props.item.map((i) => i.count));
-
-const defaultLimit = 10;
-let realLimit = 0;
-if (maxCount <= defaultLimit) {
-  realLimit = 0;
-} else {
-  realLimit = props.limit;
-}
-let pieData = props.item
-  ? props.item.map((item) => {
-      if (item.count > realLimit) {
-        return { value: item.count, name: item.name };
-      }
-    })
-  : [];
 
 const chart = ref<HTMLElement | null>(null);
+let myChart: echarts.ECharts | null = null;
 
+// 动态计算最大值和限制值
+const maxCount = computed(() => Math.max(...props.item.map((i) => i.count)));
+const realLimit = computed(() =>
+  maxCount.value <= 10 ? 0 : props.limit
+);
+
+// 动态生成饼图数据
+const pieData = computed(() =>
+  props.item
+    .filter((item) => item.count > realLimit.value)
+    .map((item) => ({
+      value: item.count,
+      name: item.name,
+    }))
+);
+
+// 初始化图表
 onMounted(() => {
   if (chart.value) {
-    const myChart = echarts.init(chart.value);
+    myChart = echarts.init(chart.value, null, { renderer: "svg" });
+    updateChart();
+  }
+});
 
-    // 配置项
+// 更新图表的函数
+function updateChart() {
+  if (myChart) {
     const option = {
       title: {
-        text: props.title || "饼图示例", // 图表标题
-        left: "left", // 标题居中
+        text: props.title || "饼图示例",
+        left: "left",
         textStyle: {
-          fontSize: 15, // 标题字体大小
+          fontSize: 15,
         },
       },
       tooltip: {
-        trigger: "item", // 提示框触发方式
-        formatter: "{a} <br/>{b}: {c} ({d}%)", // 提示框内容格式
+        trigger: "item",
+        formatter: "{a} <br/>{b}: {c} ({d}%)",
       },
       legend: {
-        orient: "vertical", // 图例垂直排列
-        left: "left", // 图例靠左
-        bottom: "0", // 图例放在底部
+        orient: "vertical",
+        left: "left",
+        bottom: "0",
       },
       series: [
         {
-          name: props.title || "数据分布", // 系列名称
-          type: "pie", // 图表类型为饼图
-          radius: "50%", // 饼图半径
-          data: pieData, // 动态生成的数据
+          name: props.title || "数据分布",
+          type: "pie",
+          radius: "50%",
+          data: pieData.value,
           emphasis: {
             itemStyle: {
-              shadowBlur: 10, // 高亮时的阴影效果
+              shadowBlur: 10,
               shadowOffsetX: 0,
               shadowColor: "rgba(0, 0, 0, 0.5)",
             },
@@ -82,11 +88,18 @@ onMounted(() => {
         },
       ],
     };
-
-    // 设置配置项并渲染图表
     myChart.setOption(option);
   }
-});
+}
+
+// 监听 props 的变化并更新图表
+watch(
+  () => [props.item, props.title, props.limit],
+  () => {
+    updateChart();
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped></style>
