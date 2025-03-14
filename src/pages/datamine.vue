@@ -61,8 +61,8 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-skeleton-loader type="table" :loading="isSearching && ruleItem.length <= 0">
-          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4">
+        <v-skeleton-loader type="table" :loading="isLoadingRule">
+          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4" :key="ruleDataTableKey">
           </v-data-table>
         </v-skeleton-loader>
       </v-col>
@@ -207,12 +207,15 @@ let tasteItem = ref<CountItem[]>([]);
 let functionCountItem = ref<CountItem[]>([]);
 let functionCountItemProp = ref<CountItem[]>([]);
 let ruleItem = ref<ruleRes[]>([]);
-
+let isLoadingRule = ref<boolean>(false);
+let ruleDataTableKey = ref<number>(0);
 
 async function searchHerbs(query: string) {
+
   if (!query) return;
   isSearching.value = true;
   isLoadingStandardInfo.value = true;
+  isLoadingRule.value = true;
   try {
     const response: searchRes = await fetch(
       `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
@@ -243,11 +246,13 @@ async function searchHerbs(query: string) {
     console.log("herbsCount.value", response.count);
 
     ruleItem.value = ruleRes;
+    ruleDataTableKey.value += 1;
   } catch (error) {
     console.error("请求失败", error);
   } finally {
     isSearching.value = false;
     isLoadingStandardInfo.value = false;
+    isLoadingRule.value = false;
   }
 }
 </script>
