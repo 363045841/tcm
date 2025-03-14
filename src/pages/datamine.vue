@@ -86,6 +86,7 @@ interface ruleRes {
   ruleAfter: string;
   confidence: string;
   lift: string;
+  count: string;
 }
 interface searchRes {
   count: CountItem[];
@@ -197,6 +198,7 @@ const ruleHeaders = [
   { title: "关联项B", key: "ruleAfter" },
   { title: "置信度", key: "confidence" },
   { title: "提升度", key: "lift" },
+  { title: "匹配数量", key: "count" },
 ];
 
 // radarProps
