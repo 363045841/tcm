@@ -18,7 +18,8 @@ h2<template>
     </v-row>
     <v-row justify="start" v-if="herbsCount.length > 0">
       <h2 class="title">包含该药材的方剂</h2>
-      <v-data-table :items="herbsCount" :headers="includeHeaders" class="mt-4" items-per-page-text="每页显示条数：" :pageText="'{0} - {1} 共 {2} 页'" >
+      <v-data-table :items="herbsCount" :headers="includeHeaders" class="mt-4" items-per-page-text="每页显示条数："
+        :pageText="'{0} - {1} 共 {2} 项'">
       </v-data-table>
     </v-row>
     <v-row v-if="natureItem.length > 0">
@@ -72,13 +73,17 @@ h2<template>
     <v-row>
       <v-col cols="12">
         <v-skeleton-loader type="table" :loading="isLoadingRule">
-          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4" 
-            items-per-page-text="每页显示条数：" :pageText="'{0} - {1} 共 {2} 页'" :key="ruleDataTableKey">
+          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4"
+            items-per-page-text="每页显示条数：" :pageText="'{0} - {1} 共 {2} 项'" :key="ruleDataTableKey">
           </v-data-table>
 
         </v-skeleton-loader>
       </v-col>
     </v-row>
+    <v-row justify="center">
+      <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="15" style="width: 100%;"></rule-graph>
+    </v-row>
+
 
   </v-container>
   <v-snackbar v-model="isSearching">
@@ -96,7 +101,7 @@ interface CountItem {
   count: number;
 }
 
-interface ruleRes {
+export interface ruleRes {
   ruleBefore: string;
   ruleAfter: string;
   confidence: string;
