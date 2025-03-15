@@ -1,5 +1,6 @@
-<template>
+h2<template>
   <v-container>
+    <!-- 搜索框 -->
     <v-row justify="center" style="margin-bottom: 0px">
       <v-col cols="8" style="margin-top: 20px">
         <v-text-field v-model="herbInput" clearable rounded label="请输入药材名称，按回车或点击搜索按钮发起搜索" variant="outlined"
@@ -15,58 +16,70 @@
         </v-text-field>
       </v-col>
     </v-row>
-    <v-row justify="center">
-      <v-data-table v-if="herbsCount.length > 0" :items="herbsCount" :headers="includeHeaders" class="mt-4">
+    <v-row justify="start" v-if="herbsCount.length > 0">
+      <h2 class="title">包含该药材的方剂</h2>
+      <v-data-table :items="herbsCount" :headers="includeHeaders" class="mt-4" items-per-page-text="每页显示条数：" :pageText="'{0} - {1} 共 {2} 页'" >
       </v-data-table>
+    </v-row>
+    <v-row v-if="natureItem.length > 0">
+      <h2 class="title">统计图表</h2>
     </v-row>
     <v-row style="margin-bottom: -24px">
       <v-col cols="6" style="padding: 0px">
-        <v-switch v-if="natureItem.length > 0" color="indigo" hide-details v-model="isMergeTinyNatureAttribute">
+        <v-switch v-if="natureItem.length > 0" color="indigo" hide-details v-model="isMergeTinyNatureAttribute"
+          style="margin-left: 12px">
           <template v-slot:label>
-            <b style="font-size: 14px">合并次级属性</b>
+            <b style="font-size: 14px;color: #808080;">合并次级属性</b>
           </template>
         </v-switch>
       </v-col>
       <v-col cols="6" style="padding: 0px">
-        <v-switch v-if="tasteItem.length > 0" color="indigo" hide-details v-model="isMergeTinyTasteAttribute">
+        <v-switch v-if="tasteItem.length > 0" color="indigo" hide-details v-model="isMergeTinyTasteAttribute"
+          style="margin-left: 12px">
           <template v-slot:label>
-            <b style="font-size: 14px">合并次级属性</b>
+            <b style="font-size: 14px;color: #808080;">合并次级属性</b>
           </template>
         </v-switch>
       </v-col>
     </v-row>
 
     <v-row justify="center">
-      <v-col cols="6" class="text-center" v-if=" natureItem.length > 0">
+      <v-col cols="6" class="text-center" v-if="natureItem.length > 0">
         <radar-chart :item="natureItem" title="配伍药材四气统计"></radar-chart>
         <!-- 是否一定要v-if重载?后续考虑优化 -->
       </v-col>
-      <v-col cols="6" v-if=" tasteItem.length > 0">
+      <v-col cols="6" v-if="tasteItem.length > 0">
         <radar-chart :item="tasteItem" title="配伍药材六味统计"></radar-chart>
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="6" v-if=" functionCountItem.length > 0">
+      <v-col cols="6" v-if="functionCountItem.length > 0">
         <pie-chart :item="functionCountItem" :limit="10" title="配伍药材功效统计"></pie-chart>
       </v-col>
-      <v-col cols="6" v-if=" functionCountItemProp.length > 0">
+      <v-col cols="6" v-if="functionCountItemProp.length > 0">
         <bar-chart :item="functionCountItemProp" title="配伍药材功效统计" :limit="15"></bar-chart>
       </v-col>
     </v-row>
-    <v-row justify="end" v-if=" functionCountItem.length > 0">
+    <v-row justify="end" v-if="functionCountItem.length > 0">
       <v-col cols="6">
         <v-range-slider :min="0" :max="functionCountItem.length" :step="1" v-model="range" @end="freshRange"
           @start="setTempRange" label="选择区间"></v-range-slider>
       </v-col>
     </v-row>
+    <v-row v-if="ruleItem.length > 0">
+      <h2 class="title">药材关联规则</h2>
+    </v-row>
     <v-row>
       <v-col cols="12">
         <v-skeleton-loader type="table" :loading="isLoadingRule">
-          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4" :key="ruleDataTableKey">
+          <v-data-table v-if="ruleItem.length > 0" :items="ruleItem" :headers="ruleHeaders" class="mt-4" 
+            items-per-page-text="每页显示条数：" :pageText="'{0} - {1} 共 {2} 页'" :key="ruleDataTableKey">
           </v-data-table>
+
         </v-skeleton-loader>
       </v-col>
     </v-row>
+
   </v-container>
   <v-snackbar v-model="isSearching">
     数据量较大时，Apriori关联规则计算需要5-10秒，请耐心等待...
@@ -75,6 +88,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+
+
 
 interface CountItem {
   name: string;
@@ -187,7 +202,6 @@ function freshRange(value: number[]) {
   console.log("functionCountItemProp", functionCountItemProp.value);
 }
 
-
 const includeHeaders = [
   { title: "药方名称", key: "recipe_name" },
   { title: "药材成分", key: "prescription_ingredients" },
@@ -211,7 +225,6 @@ let isLoadingRule = ref<boolean>(false);
 let ruleDataTableKey = ref<number>(0);
 
 async function searchHerbs(query: string) {
-
   if (!query) return;
   isSearching.value = true;
   isLoadingStandardInfo.value = true;
@@ -257,4 +270,8 @@ async function searchHerbs(query: string) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.title {
+  margin-left: 12px;
+}
+</style>

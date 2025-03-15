@@ -15,6 +15,7 @@ declare module 'vue' {
     RadarChart: typeof import('./components/mine/radarChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    RuleGraph: typeof import('./components/mine/ruleGraph.vue')['default']
     SearchAns: typeof import('./components/search/search-ans.vue')['default']
     SearchLoading: typeof import('./components/search/search-loading.vue')['default']
     SearchMain: typeof import('./components/search/search-main.vue')['default']
