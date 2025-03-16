@@ -13,9 +13,10 @@ import { type ruleRes } from "@/pages/datamine.vue";
 
 echarts.use([GraphChart, TooltipComponent, CanvasRenderer]);
 
-let props = withDefaults(defineProps<{ item: ruleRes[]; limit: number }>(), {
+let props = withDefaults(defineProps<{ item: ruleRes[]; limit: number; name: string }>(), {
   item: () => ({} as ruleRes[]), // {} 作为默认值
   limit: 100,
+  name: "",
 });
 
 const chartRef = ref(null);
@@ -24,12 +25,13 @@ let chartInstance: echarts.ECharts | null = null;
 interface dataOption {
   name: string;
   value: number;
+  category: number;
 }
 
 interface linksOption {
   source: string;
   target: string;
-  value: number; // 添加 value 属性
+  value: number; // 综合指标值
 }
 
 // 数据存储
@@ -53,8 +55,8 @@ function updateChart() {
   linksOptionArray = [];
 
   // 生成新数据
-  let dataOptionMap = new Map<string, dataOption>();
-  let linksOptionMap = new Map<string, linksOption>();
+  let dataOptionSet = new Set<string>();
+  let linksOptionMap = new Map<string, { source: string; target: string; confidence: number; lift: number }>();
 
   const len = props.item.length;
 
@@ -64,18 +66,10 @@ function updateChart() {
 
     // 生成数据点
     for (const item of splitBefore) {
-      if (!dataOptionMap.has(item)) {
-        dataOptionMap.set(item, { name: item, value: 1 });
-      } else {
-        dataOptionMap.get(item)!.value += 1;
-      }
+      dataOptionSet.add(item);
     }
     for (const item of splitAfter) {
-      if (!dataOptionMap.has(item)) {
-        dataOptionMap.set(item, { name: item, value: 1 });
-      } else {
-        dataOptionMap.get(item)!.value += 1;
-      }
+      dataOptionSet.add(item);
     }
 
     // 生成规则连线
@@ -86,23 +80,35 @@ function updateChart() {
         const key = [source, target].sort().join("-"); // 确保顺序一致
 
         if (!linksOptionMap.has(key)) {
-          linksOptionMap.set(key, { source, target, value: 1 }); // 初始化 value 为 1
+          linksOptionMap.set(key, { source, target, confidence: Number(props.item[i].confidence), lift: Number(props.item[i].lift) });
         } else {
-          linksOptionMap.get(key)!.value += 1; // 累加 value
+          // 如果已经存在，可以选择累加 confidence 和 lift（或根据需求调整逻辑）
+          const existing = linksOptionMap.get(key)!;
+          existing.confidence += Number(props.item[i].confidence); // 示例：累加 confidence
+          existing.lift += Number(props.item[i].lift); // 示例：累加 lift
         }
       }
     }
   }
 
-  dataOptionArray = Array.from(dataOptionMap.values());
-  linksOptionArray = Array.from(linksOptionMap.values());
+  // 转换数据为节点和连线
+  dataOptionArray = Array.from(dataOptionSet).map((item) => ({
+    name: item,
+    value: 1,
+    category: item === props.name ? 0 : 2,
+  }));
 
-  console.log("配置", dataOptionArray, linksOptionArray);
+  // 计算综合指标并生成连线数据
+  linksOptionArray = Array.from(linksOptionMap.values()).map((link) => {
+    // 综合指标计算（可以根据需求调整公式）
+    const combinedMetric = link.confidence * link.lift; // 示例公式
+    return { source: link.source, target: link.target, value: combinedMetric };
+  });
 
-  // 根据 value 计算边的宽度
+  // 根据 value 计算边的宽度和样式
   const maxLineWidth = 10; // 最大线宽
   const minLineWidth = 1; // 最小线宽
-  const maxValue = Math.max(...linksOptionArray.map(link => link.value)); // 获取最大 value
+  const maxValue = Math.max(...linksOptionArray.map((link) => link.value)); // 获取最大 value
 
   const seriesData = [
     {
@@ -113,28 +119,15 @@ function updateChart() {
       roam: true,
       draggable: true,
       data: dataOptionArray,
-      links: linksOptionArray.map(link => ({
+      links: linksOptionArray.map((link) => ({
         ...link,
         lineStyle: {
           width: ((link.value / maxValue) * (maxLineWidth - minLineWidth) + minLineWidth),
           color: "#999",
           curveness: 0,
+          type: link.value <= 10 ? "dashed" : "solid", // 如果权重为1，设置为虚线
         },
       })),
-      title: {
-        text: '关联规则可视化', // 动态主标题
-        left: "center",
-        top: "top",
-        textStyle: {
-          fontSize: 20,
-          fontWeight: "bold",
-          color: "#333",
-        },
-        subtextStyle: {
-          fontSize: 14,
-          color: "#aaa",
-        },
-      },
       label: {
         show: true,
         color: "#000000",
@@ -148,23 +141,31 @@ function updateChart() {
         gravity: 0.4,
         friction: 0.6,
       },
-      edgeSymbol: ["none", "arrow"],
-      edgeLabel: {
-        show: false,
-        formatter: "{c}",
-        color: "#333",
-        fontSize: 10,
-      },
+      edgeSymbol: ["none", "none"],
+      tooltip: {},
       categories: [
         { name: "0", itemStyle: { color: "#CA462F" }, symbolSize: 16 }, // 红色
         { name: "1", itemStyle: { color: "#253D24" }, symbolSize: 15 }, // 绿色
-        { name: "2", itemStyle: { color: "#9BB496" }, symbolSize: 10 }, // 蓝色
+        { name: "2", itemStyle: { color: "#9BB496" }, symbolSize: 16 }, // 蓝色
       ],
     },
   ];
 
   // 更新图表配置
   chartInstance.setOption({
+    tooltip: {
+      trigger: "item",
+      formatter: (params: any) => {
+        if (params.dataType === "edge") {
+          const edge = params.data;
+          return `连线: ${edge.source} → ${edge.target}<br>权重: ${edge.value.toFixed(2)}`;
+        } else if (params.dataType === "node") {
+          const node = params.data;
+          return `节点: ${node.name}`;
+        }
+        return "";
+      },
+    },
     series: seriesData,
   });
 }
@@ -176,11 +177,11 @@ onMounted(() => {
 
 // 在 props 更新时更新图表
 watch(
-  () => props.item, // 监听 props.item 的变化
+  () => props.item,
   () => {
     updateChart();
   },
-  { deep: true } // 深度监听，确保数组内容变化也能触发
+  { deep: true }
 );
 
 // 在组件卸载时销毁图表
@@ -190,10 +191,3 @@ onBeforeUnmount(() => {
   }
 });
 </script>
-
-<style scoped>
-.chart-container {
-  width: 100%;
-  height: 100%;
-}
-</style>

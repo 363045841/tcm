@@ -81,7 +81,7 @@ h2<template>
       </v-col>
     </v-row>
     <v-row justify="center">
-      <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="15" style="width: 100%;"></rule-graph>
+      <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="15" :name="herbInput" style="width: 100%;"></rule-graph>
     </v-row>
 
 
