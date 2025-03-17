@@ -16,33 +16,45 @@ const props = withDefaults(
   defineProps<{
     item: Array<Item>; // 数据项
     title: string; // 图表标题
-    limit: number;
   }>(),
   {
     item: () => [], // 默认值是一个空数组
     title: "默认标题", // 默认值是一个字符串
-    limit: 3, // 默认值是一个数字
   }
 );
 
 const chart = ref<HTMLElement | null>(null);
 let myChart: echarts.ECharts | null = null;
 
-// 动态计算最大值和限制值
-const maxCount = computed(() => Math.max(...props.item.map((i) => i.count)));
-const realLimit = computed(() =>
-  maxCount.value <= 10 ? 0 : props.limit
-);
-
 // 动态生成饼图数据
-const pieData = computed(() =>
-  props.item
-    .filter((item) => item.count > realLimit.value)
-    .map((item) => ({
-      value: item.count,
-      name: item.name,
-    }))
-);
+const pieData = computed(() => {
+  // 按 count 降序排序
+  const sortedItems = [...props.item].sort((a, b) => b.count - a.count);
+
+  // 取前五项
+  const topFive = sortedItems.slice(0, 10);
+
+  // 计算剩余项的总和
+  const otherCount = sortedItems
+    .slice(20)
+    .reduce((sum, item) => sum + item.count, 0);
+
+  // 构造饼图数据
+  const data = topFive.map((item) => ({
+    value: item.count,
+    name: item.name,
+  }));
+
+  // 如果有剩余项，则添加“其他”
+  if (otherCount > 0) {
+    data.push({
+      value: otherCount,
+      name: "其他",
+    });
+  }
+
+  return data;
+});
 
 // 初始化图表
 onMounted(() => {
@@ -67,11 +79,6 @@ function updateChart() {
         trigger: "item",
         formatter: "{a} <br/>{b}: {c} ({d}%)",
       },
-      legend: {
-        orient: "vertical",
-        left: "left",
-        bottom: "0",
-      },
       series: [
         {
           name: props.title || "数据分布",
@@ -94,7 +101,7 @@ function updateChart() {
 
 // 监听 props 的变化并更新图表
 watch(
-  () => [props.item, props.title, props.limit],
+  () => [props.item, props.title],
   () => {
     updateChart();
   },

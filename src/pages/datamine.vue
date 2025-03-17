@@ -81,7 +81,7 @@ h2<template>
       </v-col>
     </v-row>
     <v-row justify="center">
-      <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="15" :name="herbInput" style="width: 100%;"></rule-graph>
+      <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="5" :name="herbInput" style="width: 100%;"></rule-graph>
     </v-row>
 
 
@@ -104,6 +104,7 @@ interface CountItem {
 export interface ruleRes {
   ruleBefore: string;
   ruleAfter: string;
+  support: string;
   confidence: string;
   lift: string;
   count: string;
@@ -215,6 +216,7 @@ const includeHeaders = [
 const ruleHeaders = [
   { title: "关联项A", key: "ruleBefore" },
   { title: "关联项B", key: "ruleAfter" },
+  { title: "支持度", key: "support" },
   { title: "置信度", key: "confidence" },
   { title: "提升度", key: "lift" },
   { title: "匹配数量", key: "count" },
