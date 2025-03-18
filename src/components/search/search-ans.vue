@@ -1,25 +1,15 @@
 <template>
-  <v-list
-    v-if="loadingAttr == false && props.searchText.length > 0"
-    lines="two"
-    class="search-list"
-    rounded
-    elevation="1"
-    style="max-height: 60vh; overflow-y: auto; padding-bottom: 0px"
-  >
-    <v-list-item
-      v-for="(item, index) in filteredItems"
-      class="search-item"
-      :key="index"
-      :subtitle="item.subtitle"
-      :prepend-avatar="item.avatar"
-      @click="
+  <v-list v-if="loadingAttr == false && props.searchText.length > 0" lines="two" class="search-list" rounded
+    elevation="1" style="max-height: 60vh; overflow-y: auto; padding-bottom: 0px">
+    <v-list-item v-for="(item, index) in filteredItems" class="search-item" :key="index" :subtitle="item.subtitle"
+      :prepend-avatar="item.avatar" @click="
         clickSearchItem({
           id: item.id,
           item: item.title,
+          isETCM: item.isETCM,
+          isETCMHerbs: item.isETCMHerbs
         })
-      "
-    >
+        ">
       <template #title>
         <div style="display: flex; justify-content: space-between; width: 100%">
           <div v-if="item.title.indexOf(searchText) !== -1">
@@ -40,8 +30,7 @@
           </div>
           <div v-else>{{ item.title }}</div>
           <span v-if="item.isFuzzy">
-            <b style="font-size: small; color: gray"
-              >关联词:{{ item.fuzzyWord }}
+            <b style="font-size: small; color: gray">关联词:{{ item.fuzzyWord }}
             </b>
           </span>
         </div>
@@ -68,64 +57,39 @@
       </template>
     </v-list-item>
 
-    <div
-      class="sticky-footer"
-      style="
+    <div class="sticky-footer" style="
         display: flex;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap; /* 内容换行 */
         min-height: 45px; /* 最小高度 */
         padding-bottom: 5px;
-      "
-    >
+      ">
       <span style="margin: 10px; white-space: nowrap">猜你想搜</span>
-      <span
-        v-for="(item, index) in FuzzySearchResStore.searchShow"
-        :key="index"
-        style="
+      <span v-for="(item, index) in FuzzySearchResStore.searchShow" :key="index" style="
           margin-left: 10px;
           margin-right: 10px;
           color: rgb(16, 104, 191);
           white-space: nowrap;
-        "
-        @click="emit('changeFatherSearchText', item.title)"
-      >
+        " @click="emit('changeFatherSearchText', item.title)">
         {{ item.title }}
       </span>
     </div>
   </v-list>
-  <v-list
-    v-if="props.searchText.length == 0"
-    class="search-list"
-    rounded
-    elevation="1"
-    lines="two"
-  >
+  <v-list v-if="props.searchText.length == 0" class="search-list" rounded elevation="1" lines="two">
     <div style="margin-top: 16px">
       <h5 style="margin-left: 24px; margin-right: 4px; display: inline">
         历史搜索记录
       </h5>
-      <v-btn
-        density="compact"
-        icon="mdi-pencil"
-        size="small"
-        flat
-        @click="historyListClosable = !historyListClosable"
-      ></v-btn>
+      <v-btn density="compact" icon="mdi-pencil" size="small" flat
+        @click="historyListClosable = !historyListClosable"></v-btn>
     </div>
     <v-container>
-      <v-chip
-        v-for="(item, index) in historyListVList"
-        :key="index"
-        style="margin: 4px"
-        @click:close="deleteHistoryListStorage(item)"
-        @click="
+      <v-chip v-for="(item, index) in historyListVList" :key="index" style="margin: 4px"
+        @click:close="deleteHistoryListStorage(item)" @click="
           emit('changeFatherSearchText', item);
-          debouncedWatchHandler(item);
-        "
-        :closable="historyListClosable"
-      >
+        debouncedWatchHandler(item);
+        " :closable="historyListClosable">
         {{ item }}
       </v-chip>
     </v-container>
@@ -198,13 +162,23 @@ const router = useRouter();
 interface clickPara {
   item: string;
   id: number;
+  isETCM: boolean;
+  isETCMHerbs: boolean;
 }
 
 function clickSearchItem(config: clickPara) {
-  console.log("点击了搜索结果", config.item);
-  updateHistoryListStorage(props.searchText);
-  router.push({ path: `/item/${config.id}` });
-  // router.push({path: `/item/${item.id}`});
+  if (!config.isETCM && !config.isETCMHerbs) {
+    console.log("点击了搜索结果", config);
+    updateHistoryListStorage(props.searchText);
+    router.push({ path: `/item/${config.id}` });
+    // router.push({path: `/item/${item.id}`});
+  }
+  else if(config.isETCM === true){
+    alert('中药方剂暂未开放')
+  }
+  else if(config.isETCMHerbs === true){
+    alert('中药材暂未开放')
+  }
 }
 
 // DEMO 模拟搜索加载时间
@@ -216,9 +190,6 @@ setTimeout(() => {
 // 搜索关键词并渲染搜索结果
 import { debounce } from "lodash"; // 引入防抖函数
 import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
-import { interpreterDirective } from "@babel/types";
-import { fa } from "vuetify/locale";
-
 const filteredItems = ref<Array<TitleInfo>>([]);
 
 // 将函数逻辑封装为一个防抖处理的函数
@@ -246,6 +217,8 @@ const debouncedWatchHandler = debounce(
         avatar: `http://www.zhongyoo.com${word.picUrl}`,
         fuzzyWord: word.word,
         isFuzzy: false,
+        isETCM: false,
+        isETCMHerbs: false,
       });
     }
     for (let word of templist.fuzzy) {
@@ -253,7 +226,7 @@ const debouncedWatchHandler = debounce(
         title: word,
       });
     }
-    for (let word of templist.ETCM){
+    for (let word of templist.ETCM) {
       dataStore.title.push({
         id: word.id,
         title: word.recipeName,
@@ -261,9 +234,11 @@ const debouncedWatchHandler = debounce(
         avatar: '',
         fuzzyWord: '',
         isFuzzy: false,
+        isETCM: true,
+        isETCMHerbs: false,
       })
     }
-    for(let word of templist.ETCMHerbs) {
+    for (let word of templist.ETCMHerbs) {
       dataStore.title.push({
         id: word.id,
         title: word.name,
@@ -271,8 +246,11 @@ const debouncedWatchHandler = debounce(
         avatar: '',
         fuzzyWord: '',
         isFuzzy: false,
+        isETCM: false,
+        isETCMHerbs: true,
       })
     }
+
     dataStore.title.sort((a, b) => {
       if (a.title === query) {
         return -1;
@@ -362,9 +340,8 @@ interface AccurateSearchRes {
 // 真实模糊搜索接口调用
 async function getFuzzySearchAns(
   searchWord: string,
-  url: string = `${import.meta.env.VITE_IP}:${
-    import.meta.env.VITE_BACKEND_PORT
-  }/api/v1/search?wd=`
+  url: string = `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
+    }/api/v1/search?wd=`
 ): Promise<SearchRes> {
   console.log("发起搜索：", url + searchWord);
   try {
@@ -393,13 +370,17 @@ async function getFuzzySearchAns(
 .loading {
   height: 25vh;
 }
+
 .v-list::-webkit-scrollbar {
-  width: 0px; /* 设置滚动条宽度为0 */
-  background: transparent; /* 可选：设置背景透明 */
+  width: 0px;
+  /* 设置滚动条宽度为0 */
+  background: transparent;
+  /* 可选：设置背景透明 */
 }
 
 .v-list::-webkit-scrollbar-thumb {
-  background: transparent; /* 可选：设置滚动条滑块透明 */
+  background: transparent;
+  /* 可选：设置滚动条滑块透明 */
 }
 
 .sticky-footer {

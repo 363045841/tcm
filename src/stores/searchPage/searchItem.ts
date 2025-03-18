@@ -8,13 +8,14 @@ export interface TitleInfo {
   avatar: string;
   fuzzyWord: string;
   isFuzzy: boolean;
+  isETCM: boolean;
+  isETCMHerbs: boolean;
 }
 
 export interface Item {
   title: TitleInfo[];
   emptytitle: TitleInfo[];
   historyAlertTitle: TitleInfo[];
-  history: TitleInfo[];
   strongTitle: Map<number, [number, number]>;
   strongSubTitle: Map<number, [number, number]>;
   isFirstSearch: boolean;
@@ -30,6 +31,8 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
         avatar: "",
         fuzzyWord: "",
         isFuzzy: false,
+        isETCM: false,
+        isETCMHerbs: false,
       },
     ],
     emptytitle: [
@@ -40,6 +43,8 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
         avatar: "",
         fuzzyWord: "",
         isFuzzy: false,
+        isETCM: false,
+        isETCMHerbs: false,
       },
     ],
     historyAlertTitle: [
@@ -50,9 +55,11 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
         avatar: "",
         fuzzyWord: "",
         isFuzzy: false,
+        isETCM: false,
+        isETCMHerbs: false,
       },
     ],
-    history: [
+    /* history: [
       {
         id: 0,
         title: "这是历史记录，但我并没有做这个功能，略略略",
@@ -60,8 +67,10 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
         avatar: "",
         fuzzyWord: "",
         isFuzzy: false,
+        isETCM: false,
+
       },
-    ],
+    ], */
     strongTitle: new Map<number, [number, number]>(),
     strongSubTitle: new Map<number, [number, number]>(),
     isFirstSearch: true,

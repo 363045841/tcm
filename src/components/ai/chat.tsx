@@ -134,7 +134,7 @@ const HelloWorld = defineComponent({
         layout: {
           width: "100%",
           "min-width": "1000px",
-          height: "722px",
+          height: "100%",
           "border-radius": `${token.value.borderRadius}px`,
           display: "flex",
           background: `${token.value.colorBgContainer}`,
