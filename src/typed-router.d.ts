@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/datamine': RouteRecordInfo<'/datamine', '/datamine', Record<never, never>, Record<never, never>>,
     '/item/[id]': RouteRecordInfo<'/item/[id]', '/item/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/item/etcm/[name]': RouteRecordInfo<'/item/etcm/[name]', '/item/etcm/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
+    '/item/etcm/guji/[name]': RouteRecordInfo<'/item/etcm/guji/[name]', '/item/etcm/guji/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/list': RouteRecordInfo<'/list', '/list', Record<never, never>, Record<never, never>>,
     '/test': RouteRecordInfo<'/test', '/test', Record<never, never>, Record<never, never>>,
   }

@@ -7,7 +7,8 @@
           id: item.id,
           item: item.title,
           isETCM: item.isETCM,
-          isETCMHerbs: item.isETCMHerbs
+          isETCMHerbs: item.isETCMHerbs,
+          title: item.title,
         })
         ">
       <template #title>
@@ -164,20 +165,21 @@ interface clickPara {
   id: number;
   isETCM: boolean;
   isETCMHerbs: boolean;
+  title: string;
 }
 
+
 function clickSearchItem(config: clickPara) {
+  updateHistoryListStorage(props.searchText);
   if (!config.isETCM && !config.isETCMHerbs) {
     console.log("点击了搜索结果", config);
-    updateHistoryListStorage(props.searchText);
     router.push({ path: `/item/${config.id}` });
-    // router.push({path: `/item/${item.id}`});
   }
   else if(config.isETCM === true){
-    alert('中药方剂暂未开放')
+    router.push({path: `/item/etcm/guji/${config.title}`});
   }
   else if(config.isETCMHerbs === true){
-    alert('中药材暂未开放')
+    router.push({path: `/item/etcm/${config.title}`});
   }
 }
 

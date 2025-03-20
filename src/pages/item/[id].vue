@@ -80,7 +80,10 @@ watch(
   async (newVal) => {
     console.log("发现了更新！", newVal);
     if (newVal !== "") {
-      items.value = await useGetETCMData(newVal);
+      const temp = await useGetETCMData(newVal);
+      if(temp){
+        items.value = temp;
+      }
       infoStore.tcmName = "";
     }
   }

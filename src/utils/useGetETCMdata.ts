@@ -76,19 +76,25 @@ export async function useGetETCMData(name: string) {
     ["相似基因名", "similarGene"],
     ["相似基因值", "similarGeneNumber"],
   ]);
-
+  console.log(
+    `${import.meta.env.VITE_IP}:${
+      import.meta.env.VITE_BACKEND_PORT
+    }/api/v1/etcm/${name}`
+  );
   let res = await fetch(
     `${import.meta.env.VITE_IP}:${
       import.meta.env.VITE_BACKEND_PORT
     }/api/v1/etcm/${name}`
   ).then((res) => res.json());
-
-  let etcmDataArray = Object.values(res);
-  etcmDataArray.shift();
-  let i = 0;
-  for (const key of chineseToEnglishMap.keys()) {
-    items.value[key as keyof typeof items.value] = etcmDataArray[i++] as any;
+  if (res) {
+    let etcmDataArray = Object.values(res);
+    etcmDataArray.shift();
+    let i = 0;
+    for (const key of chineseToEnglishMap.keys()) {
+      items.value[key as keyof typeof items.value] = etcmDataArray[i++] as any;
+    }
+    return items.value as ETCMData;
+  } else {
+    return null;
   }
-
-  return items.value as ETCMData;
 }

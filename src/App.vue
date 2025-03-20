@@ -5,7 +5,7 @@
       :rail-width="60">
       <v-list density="compact" nav>
         <!-- 标题 -->
-        <v-list-item title="我超,中医药" subtitle="中药数据查询一站式平台" prepend-icon="mdi-medical-bag">
+        <v-list-item title="药易寻" subtitle="中药数据查询一站式平台" prepend-icon="mdi-medical-bag">
         </v-list-item>
         <v-divider></v-divider>
 
@@ -68,12 +68,10 @@ setTimeout(() => {
 
 // 随机页面功能
 function handleClickVListItem(itemText: string) {
-  if(itemText === "随机页面") {
+  if (itemText === "随机页面") {
     generateRandomNumber();
   }
 }
-
-
 
 let randomNum = ref<number>(Math.floor(Math.random() * 100));
 let RouterViewKey = ref<number>(0);
