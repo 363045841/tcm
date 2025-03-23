@@ -83,18 +83,18 @@ h2<template>
     <v-row justify="center">
       <rule-graph v-if="ruleItem.length > 0" :item="ruleItem" :limit="5" :name="herbInput" style="width: 100%;"></rule-graph>
     </v-row>
-
-
   </v-container>
   <v-snackbar v-model="isSearching">
-    数据量较大时，Apriori关联规则计算需要5-10秒，请耐心等待...
+    数据量较大时，FP_Growth关联规则计算需要5-10秒，请耐心等待...
   </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 
-
+onMounted(() => {
+  document.body.style.overflow = "auto";
+})
 
 interface CountItem {
   name: string;
