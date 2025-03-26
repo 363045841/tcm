@@ -11,7 +11,8 @@
           title: item.title,
         })
         ">
-      <template v-if="!item.isETCM && !item.isETCMHerbs" #prepend>
+      <template v-if="!item.isETCM && !item.isETCMHerbs && item.id !== 0" #prepend>
+        {{ console.log(`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${item.id}.jpg`) }}
         <img :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${item.id}.jpg`"
           class="circle-image" style="width: 40px; height: 40px; margin-right: 15px;">{{ console.log('123', item.avatar)
           }}
@@ -345,15 +346,13 @@ interface AccurateSearchRes {
 
 // 真实模糊搜索接口调用
 async function getFuzzySearchAns(
-  searchWord: string,
-  url: string = `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
-    }/api/v1/search?wd=`
-): Promise<SearchRes> {
+  searchWord: string
+) {
+  let url = `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/search?wd=${searchWord}`;
   console.log("发起搜索：", url + searchWord);
   try {
-    url = url + searchWord;
-    const res = await fetch(url, { method: "GET" });
-    const data = await res.json();
+    let res = await fetch(url);
+    let data = await res.json();
 
     return data;
   } catch (error) {

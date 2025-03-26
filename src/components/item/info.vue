@@ -1,7 +1,8 @@
 <template>
   <div>
     <img
-      :src="`http://www.zhongyoo.com${chineseMedicineData.pic}`"
+      :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${ID}.jpg`"
+
       alt="中药图片"
       style="
         max-width: 50vh;
