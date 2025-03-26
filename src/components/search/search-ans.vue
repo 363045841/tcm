@@ -2,7 +2,7 @@
   <v-list v-if="loadingAttr == false && props.searchText.length > 0" lines="two" class="search-list" rounded
     elevation="1" style="max-height: 60vh; overflow-y: auto; padding-bottom: 0px">
     <v-list-item v-for="(item, index) in filteredItems" class="search-item" :key="index" :subtitle="item.subtitle"
-      :prepend-avatar="item.avatar" @click="
+      @click="
         clickSearchItem({
           id: item.id,
           item: item.title,
@@ -11,6 +11,13 @@
           title: item.title,
         })
         ">
+      <template v-if="!item.isETCM && !item.isETCMHerbs" #prepend>
+        <img :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${item.id}.jpg`"
+          class="circle-image" style="width: 40px; height: 40px; margin-right: 15px;">{{ console.log('123', item.avatar)
+          }}
+        </img>
+      </template>
+      
       <template #title>
         <div style="display: flex; justify-content: space-between; width: 100%">
           <div v-if="item.title.indexOf(searchText) !== -1">
@@ -30,10 +37,10 @@
             }}</span>
           </div>
           <div v-else>{{ item.title }}</div>
-          <span v-if="item.isFuzzy">
+          <!-- <span v-if="item.isFuzzy">
             <b style="font-size: small; color: gray">关联词:{{ item.fuzzyWord }}
             </b>
-          </span>
+          </span> -->
         </div>
       </template>
 
@@ -99,14 +106,13 @@
   <!-- <loading v-if="loadingAttr"></loading> -->
 </template>
 
+
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useComponentsSearchItemStore } from "@/stores/searchPage/searchItem";
 import { type TitleInfo } from "@/stores/searchPage/searchItem";
-import loading from "./search-loading.vue";
-import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
-import { FuzzyItem } from "@/stores/searchPage/fuzzySearchRes";
 
+import { useComponentsShowStore } from "@/stores/searchPage/componentsShow";
 const showStore = useComponentsShowStore();
 const emit = defineEmits(["changeFatherSearchText"]);
 
@@ -175,11 +181,11 @@ function clickSearchItem(config: clickPara) {
     console.log("点击了搜索结果", config);
     router.push({ path: `/item/${config.id}` });
   }
-  else if(config.isETCM === true){
-    router.push({path: `/item/etcm/guji/${config.title}`});
+  else if (config.isETCM === true) {
+    router.push({ path: `/item/etcm/guji/${config.title}` });
   }
-  else if(config.isETCMHerbs === true){
-    router.push({path: `/item/etcm/${config.title}`});
+  else if (config.isETCMHerbs === true) {
+    router.push({ path: `/item/etcm/${config.title}` });
   }
 }
 
@@ -193,7 +199,6 @@ setTimeout(() => {
 import { debounce } from "lodash"; // 引入防抖函数
 import { useComponentsFuzzyShowStore } from "@/stores/searchPage/fuzzySearchRes";
 const filteredItems = ref<Array<TitleInfo>>([]);
-
 // 将函数逻辑封装为一个防抖处理的函数
 const debouncedWatchHandler = debounce(
   async (query: string) => {
@@ -216,7 +221,7 @@ const debouncedWatchHandler = debounce(
         id: word.id,
         title: word.title,
         subtitle: word.description,
-        avatar: `http://www.zhongyoo.com${word.picUrl}`,
+        avatar: '',
         fuzzyWord: word.word,
         isFuzzy: false,
         isETCM: false,
@@ -233,8 +238,8 @@ const debouncedWatchHandler = debounce(
         id: word.id,
         title: word.recipeName,
         subtitle: word.prescriptionIngredients,
-        avatar: '',
-        fuzzyWord: '',
+        avatar: `${word.id}.jpg}`,
+        fuzzyWord: `https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${word.id}`,
         isFuzzy: false,
         isETCM: true,
         isETCMHerbs: false,
@@ -269,7 +274,6 @@ const debouncedWatchHandler = debounce(
         break;
       }
     }
-
 
     // dataStore.title.sort((a, b) => (a.fuzzyWord === query ? -1 : 1));
     // console.log("加载的标题：", dataStore.title);
@@ -393,5 +397,12 @@ async function getFuzzySearchAns(
   z-index: 1;
   border-radius: 10px;
   overflow: hidden;
+}
+
+.circle-image {
+  border-radius: 30%;
+  /* 设置圆角为 50%，形成圆形 */
+  object-fit: cover;
+  /* 确保图片内容填充整个圆形区域 */
 }
 </style>
