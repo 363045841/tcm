@@ -16,16 +16,22 @@ import {
 import {
   CloudUploadOutlined,
   CommentOutlined,
+  CopyOutlined,
+  DislikeOutlined,
   EllipsisOutlined,
   FireOutlined,
   HeartOutlined,
+  LikeOutlined,
   PaperClipOutlined,
   PlusOutlined,
   ReadOutlined,
   ShareAltOutlined,
   SmileOutlined,
+  SyncOutlined,
+  UserOutlined,
 } from "@ant-design/icons-vue";
 import { Badge, Button, Space, theme } from "ant-design-vue";
+import Thought from "./thought.vue";
 
 const HelloWorld = defineComponent({
   setup() {
@@ -116,15 +122,34 @@ const HelloWorld = defineComponent({
       ai: {
         placement: "start",
         typing: { step: 5, interval: 20 },
-        styles: {
+        avatar: { icon: <UserOutlined />, style: { background: "#fde3cf" } },
+        header: <Thought></Thought>,
+        /* styles: {
           content: {
             borderRadius: "16px",
           },
-        },
+        }, */
+        shape: "corner",
+        footer: (
+          <Space size="small">
+            <Button type="text" size="small" icon={<SyncOutlined />} />
+            <Button type="text" size="small" icon={<CopyOutlined />} />
+            <Button type="text" size="small" icon={<LikeOutlined />} />
+            <Button type="text" size="small" icon={<DislikeOutlined />} />
+          </Space>
+        ),
       },
       local: {
         placement: "end",
         variant: "shadow",
+        avatar: { icon: <UserOutlined />, style: { background: "#87d068" } },
+        shape: "corner",
+      },
+      suggestion: {
+        placement: 'start',
+        avatar: { icon: <UserOutlined />, style: { visibility: 'hidden' } },
+        variant: 'borderless',
+        messageRender: (items) => <Prompts vertical items={items as any} />,
       },
     };
 
@@ -210,8 +235,13 @@ const HelloWorld = defineComponent({
 
     const [agent] = useXAgent({
       request: async ({ message }, { onSuccess }) => {
+        messages.value.push({
+          id: `msg_loading_${messages.value.length}`,
+          message: "loading",
+          status: "loading",
+        });
+
         agentRequestLoading.value = true;
-        // await sleep();
         interface createRes {
           request_id: string;
           conversation_id: string;
@@ -258,9 +288,19 @@ const HelloWorld = defineComponent({
           });
         console.log(res);
         const { zhengxing, tedian, zhiliaofangfa, jibing } = res as aiResInfo;
-        const res_str = `【证型】：${zhengxing}\n【特点】：${tedian}\n【治疗方式】：${zhiliaofangfa}\n【疾病】：${jibing}`;
-        onSuccess(res_str);
-        agentRequestLoading.value = false;
+
+        setTimeout(() => {
+          const res_str = `【证型】：${zhengxing}\n【特点】：${tedian}\n【治疗方式】：${zhiliaofangfa}\n【疾病】：${jibing}`;
+          console.log("之前", toRaw(messages.value));
+          messages.value.pop();
+          console.log("之后", toRaw(messages.value));
+          onSuccess(res_str);
+          console.log("最终", toRaw(messages.value));
+          agentRequestLoading.value = false; // 测试思维链用
+          messages.value.push({
+            
+          })
+        }, 1000);
       },
     });
 
@@ -279,11 +319,21 @@ const HelloWorld = defineComponent({
     );
 
     const onSubmit = async (nextContent: string) => {
-      if (!nextContent) return;
-      agentRequestLoading.value = true;
-      onRequest(nextContent); //他这个库自己的，先调后端接口应付一下，后续流式输出再考虑websocket对接
+      if (!nextContent) return; // 判断提交内容是否为空，是空直接返回避免提交
 
+      /* messages.value.push({
+        id: `msg_loading_${messages.value.length}`,
+        message: 'loading...',
+        status: 'success',
+      }) */
+
+      agentRequestLoading.value = true; // 加载状态显示
+      // console.log('发送后',messages.value)
+      onRequest(nextContent); //他这个库自己的，先调后端接口应付一下，后续流式输出再考虑websocket对接
+      // 调用请求模型的hook
+      // console.log('value',messages.value)
       content.value = "";
+      // console.log("发送完毕", messages.value);
     };
 
     const onPromptsItemClick: PromptsProps["onItemClick"] = (info) => {
@@ -338,6 +388,7 @@ const HelloWorld = defineComponent({
       </Space>
     ));
 
+    // 把message格式转换为items的格式，这里可以自定义消息转换格式
     const items = computed<BubbleListProps["items"]>(() =>
       messages.value.map(({ id, message, status }) => ({
         key: id,
@@ -416,6 +467,7 @@ const HelloWorld = defineComponent({
           />
         </div>
         <div style={styles.value.chat}>
+          {/*  {agentRequestLoading.value && <Thought />} */}
           <Bubble.List
             items={
               items.value.length > 0
@@ -424,8 +476,9 @@ const HelloWorld = defineComponent({
             }
             roles={roles}
             style={styles.value.messages}
-          />
+          ></Bubble.List>
           {/* <Prompts style={{ color: token.value.colorText }} items={senderPromptsItems} onItemClick={onPromptsItemClick} /> */}
+
           <Sender
             value={content.value}
             header={senderHeader.value}
