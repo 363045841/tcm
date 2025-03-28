@@ -30,12 +30,68 @@ import {
   SyncOutlined,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import { Badge, Button, Space, theme } from "ant-design-vue";
+import { Badge, Button, Card, Space, theme } from "ant-design-vue";
+import thought from "./thought.vue";
+
+import socketService from "@/services/socket.service";
+import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
 
+interface Outputs {
+  references: any[];
+}
+
+interface Content {
+  result_type: string;
+  event_code: number;
+  event_message: string;
+  event_type: string;
+  event_id: string;
+  event_status: string;
+  content_type: string;
+  visible_scope: string;
+  outputs: Outputs;
+}
+
+interface ResponseData {
+  request_id: string;
+  date: string;
+  answer: string;
+  conversation_id: string;
+  message_id: string;
+  is_completion: boolean;
+  content: Content[];
+}
+
 const HelloWorld = defineComponent({
+  data() {
+    return {
+      socketMessageAnswer: [] as string[],
+    };
+  },
+  mounted() {
+    /* const socket = socketService.connect("http://139.196.234.35:3001");
+
+    socket.on("receiveMessage", (chunk: any) => {
+      this.socketMessageAnswer.push(chunk); // 将接收到的数据添加到 messages 数组
+      console.log(chunk);
+    });
+
+    // 监听连接成功事件
+    socket.on("connect", () => {
+      console.log("WebSocket 连接成功");
+    });
+
+    // 监听错误事件
+    socket.on("error", (error: any) => {
+      console.error("WebSocket 错误:", error);
+    }); */
+  },
+
   setup() {
+    const agentRequestLoading = ref(false);
     const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
+    let isCompletion = ref(true);
 
     const renderTitle = (icon: VNode, title: string) => (
       <Space align="start">
@@ -117,18 +173,34 @@ const HelloWorld = defineComponent({
         icon: <ReadOutlined style={{ color: "#1890FF" }} />,
       },
     ];
-
-    const roles: BubbleListProps["roles"] = {
+    /* let RAGList = ref<RAGInfo[]>([
+      {
+        id: "msg",
+        text: "RAG内容第一条",
+      },
+      {
+        id: "msg",
+        text: "RAG内容第二条",
+      },
+      {
+        id: "msg",
+        text: "RAG内容第三条",
+      },
+    ]); */
+    let RAGdoc = ref<string[]>(["123"]);
+    let thoughtKey = ref<number>(0);
+    // 各种卡片的样式，插槽啥的在这加
+    const roles = computed<BubbleListProps["roles"]>(() => ({
       ai: {
         placement: "start",
         typing: { step: 5, interval: 20 },
         avatar: { icon: <UserOutlined />, style: { background: "#fde3cf" } },
-        header: <Thought></Thought>,
-        /* styles: {
-          content: {
-            borderRadius: "16px",
-          },
-        }, */
+        header: (
+          <Thought
+            isComplete={!agentRequestLoading.value}
+            ragList={RAGdoc.value}
+          />
+        ),
         shape: "corner",
         footer: (
           <Space size="small">
@@ -146,12 +218,12 @@ const HelloWorld = defineComponent({
         shape: "corner",
       },
       suggestion: {
-        placement: 'start',
-        avatar: { icon: <UserOutlined />, style: { visibility: 'hidden' } },
-        variant: 'borderless',
+        placement: "start",
+        avatar: { icon: <UserOutlined />, style: { visibility: "hidden" } },
+        variant: "borderless",
         messageRender: (items) => <Prompts vertical items={items as any} />,
       },
-    };
+    }));
 
     const { token } = theme.useToken();
     const styles = computed(() => {
@@ -231,13 +303,12 @@ const HelloWorld = defineComponent({
     const conversationsItems = ref(defaultConversationsItems); // 左侧对话列表
     const activeKey = ref(defaultConversationsItems[0].key);
     const attachedFiles = ref<AttachmentsProps["items"]>([]);
-    const agentRequestLoading = ref(false);
 
     const [agent] = useXAgent({
       request: async ({ message }, { onSuccess }) => {
         messages.value.push({
           id: `msg_loading_${messages.value.length}`,
-          message: "loading",
+          message: "",
           status: "loading",
         });
 
@@ -246,6 +317,7 @@ const HelloWorld = defineComponent({
           request_id: string;
           conversation_id: string;
         }
+
         let conversationInfo: createRes = await fetch(
           `${import.meta.env.VITE_IP}:${
             import.meta.env.VITE_BACKEND_PORT
@@ -260,12 +332,13 @@ const HelloWorld = defineComponent({
           });
         console.log(conversationInfo);
 
-        interface aiResInfo {
+        interface aiesInfo {
           zhengxing: string;
           tedian: string;
           zhiliaofangfa: string;
           jibing: string;
         }
+        RAGdoc.value.length = 0;
         let res = await fetch(
           `${import.meta.env.VITE_IP}:${
             import.meta.env.VITE_BACKEND_PORT
@@ -278,29 +351,67 @@ const HelloWorld = defineComponent({
             body: JSON.stringify({
               message: message,
               conversation_id: conversationInfo.conversation_id,
+              stream: true,
             }),
           }
-        )
-          .then((res) => res.json())
+        );
+        const socket = socketService.connect("http://139.196.234.35:3001");
+        socket.on("receiveMessage", async (chunk: string) => {
+          try {
+            let res = JSON.parse(chunk);
+            if (res.is_completion) {
+              // isCompletion.value = true;
+              eventBus.emit("updateRAGCard", true);
+              agentRequestLoading.value = false;
+              socket.close();
+            }
+
+            // console.log(res);
+            messages.value[messages.value.length - 1].message += res.answer;
+            if (
+              "message_type" in res.content[0].outputs &&
+              res.content[0].outputs.message_type === "json"
+            ) {
+              let RAGdata = JSON.parse(res.content[0].outputs.message);
+              (RAGdata.RAGreference as any[]).forEach((item) => {
+                RAGdoc.value.push(item.content as string);
+                console.log("RAG!!!", RAGdoc.value);
+                thoughtKey.value += 1;
+              });
+            }
+
+            messages.value[messages.value.length - 1].status = "success";
+          } catch (error) {
+            console.error(error);
+          }
+        });
+
+        // 监听连接成功事件
+        socket.on("connect", () => {
+          console.log("WebSocket 连接成功");
+        });
+
+        // 监听错误事件
+        socket.on("error", (error: any) => {
+          console.error("WebSocket 错误:", error);
+        });
+        /* .then((res) => res.json())
           .then((res) => {
             console.log(res);
             return res;
           });
         console.log(res);
-        const { zhengxing, tedian, zhiliaofangfa, jibing } = res as aiResInfo;
+        const { zhengxing, tedian, zhiliaofangfa, jibing } = res as aiResInfo; */
 
-        setTimeout(() => {
-          const res_str = `【证型】：${zhengxing}\n【特点】：${tedian}\n【治疗方式】：${zhiliaofangfa}\n【疾病】：${jibing}`;
+        /* setTimeout(() => {
+          // const res_str = `【证型】：${zhengxing}\n【特点】：${tedian}\n【治疗方式】：${zhiliaofangfa}\n【疾病】：${jibing}`;
           console.log("之前", toRaw(messages.value));
           messages.value.pop();
           console.log("之后", toRaw(messages.value));
           onSuccess(res_str);
           console.log("最终", toRaw(messages.value));
           agentRequestLoading.value = false; // 测试思维链用
-          messages.value.push({
-            
-          })
-        }, 1000);
+        }, 1000); */
       },
     });
 
@@ -320,13 +431,8 @@ const HelloWorld = defineComponent({
 
     const onSubmit = async (nextContent: string) => {
       if (!nextContent) return; // 判断提交内容是否为空，是空直接返回避免提交
-
-      /* messages.value.push({
-        id: `msg_loading_${messages.value.length}`,
-        message: 'loading...',
-        status: 'success',
-      }) */
-
+      isCompletion.value = false;
+      eventBus.emit("updateRAGCard", false);
       agentRequestLoading.value = true; // 加载状态显示
       // console.log('发送后',messages.value)
       onRequest(nextContent); //他这个库自己的，先调后端接口应付一下，后续流式输出再考虑websocket对接
@@ -488,6 +594,18 @@ const HelloWorld = defineComponent({
             loading={agentRequestLoading.value}
             style={styles.value.sender}
           />
+          {/* <Thought
+            isComplete={!agentRequestLoading.value}
+            ragList={RAGdoc.value}
+          ></Thought> */}
+          {/* <button
+            onClick={() => {
+              isCompletion.value = !isCompletion.value;
+              console.log(isCompletion.value);
+            }}
+          >
+            change
+          </button> */}
         </div>
       </div>
     );

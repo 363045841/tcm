@@ -21,5 +21,7 @@ declare module 'vue' {
     SearchLoading: typeof import('./components/search/search-loading.vue')['default']
     SearchMain: typeof import('./components/search/search-main.vue')['default']
     Thought: typeof import('./components/ai/thought.vue')['default']
+    Thought_finish: typeof import('./components/ai/thought_finish.vue')['default']
+    Thought_loading: typeof import('./components/ai/thought_loading.vue')['default']
   }
 }

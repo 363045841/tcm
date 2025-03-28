@@ -1,0 +1,32 @@
+{
+    "request_id": "80cbca32-96f1-4057-ac3d-9901554847d4",
+    "date": "2025-03-28T15:23:52Z",
+    "answer": "",
+    "conversation_id": "fc5fcfc4-be7d-43bd-b185-e182751eec5a",
+    "message_id": "57a77951-ac0f-4f7a-98d0-d2b6baddc9cf",
+    "is_completion": false,
+    "content": [
+        {
+            "result_type": "chatflow",
+            "event_code": 0,
+            "event_message": "",
+            "event_type": "chatflow",
+            "event_id": "3",
+            "event_status": "running",
+            "content_type": "publish_message",
+            "visible_scope": "all",
+            "outputs": {
+                "message_type": "json",
+                "message_id": "205fb1a2-414f-4d46-a313-e0d064556e17",
+                "message_extra": {},
+                "message": "{\"RAGreference\": [{\"segment_id\": \"29778f62-3207-4d74-be06-2c369342a86f\", \"document_id\": \"fdb0df21-8ac1-44be-ae83-cdf6b365fe87\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.5062023997306824, \"content\": \"user_id: 449335\\nlcd_id: BNG070\\nlcd_name: 眩晕病\\nsyndrome: 肝阳上亢证\\nchief_complaint: 头晕，头昏沉2天\\ndescription: 患者约于2天前无明显诱因出现头晕、头昏沉不适，在诊所测血压偏高（具体不详），自行服用降压药物（具体用药就量不详），后症状稍好转。现仍感头晕、头昏沉，症状持续不缓解，病程中无视物或自身旋转感，无耳鸣耳聋耳部胀闷感，无畏光畏声头痛，为进一步中西医结合治疗，遂入本科，入院症状：神志清晰，精神欠佳，头晕、头昏沉，无恶心、呕吐，进食尚可，夜寐尚安，二便调。\\ndetection: 神志清晰，精神欠佳，形体适中，语言清晰，口唇红润；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌暗，苔白，脉细涩。\\nnorm_syndrome: 肝阳上亢证\", \"document_name\": \"train\", \"dataset_name\": \"中医\", \"word_count\": 438, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}, {\"segment_id\": \"8aeead48-b83f-4b7f-a4f4-67266529095e\", \"document_id\": \"fdb0df21-8ac1-44be-ae83-cdf6b365fe87\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.49929574131965637, \"content\": \"user_id: 430821\\nlcd_id: BNG070\\nlcd_name: 眩晕病\\nsyndrome: 痰湿中阻证\\nchief_complaint: 头晕头昏沉3天\\ndescription: 患者约于3天前无明显诱因出现头晕、头昏沉不适，睡眠差，症状持续不缓解，病程中无视物或自身旋转感，无耳鸣耳聋耳部胀闷感，无畏光畏声头痛，为进一步中西医结合治疗，遂入本科，入院症状：神志清晰，精神欠佳，头晕、头昏沉，无恶心、呕吐，进食尚可，夜寐差，二便调。\\ndetection: 神志清晰，精神欠佳，形体偏胖，语言清晰，口唇发绀；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌淡白，苔白，脉细。\\nnorm_syndrome: 痰湿中阻证\", \"document_name\": \"train\", \"dataset_name\": \"中医\", \"word_count\": 389, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}, {\"segment_id\": \"575d92cc-c595-4dab-831e-a2ebd6aacaab\", \"document_id\": \"fdb0df21-8ac1-44be-ae83-cdf6b365fe87\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.4984741508960724, \"content\": \"user_id: 442932\\nlcd_id: BNG070\\nlcd_name: 眩晕病\\nsyndrome: 痰湿蒙窍证\\nchief_complaint: 头晕昏沉1月\\ndescription: 患者于1月前无明显诱因出现头晕昏沉，时有站立不稳感，症状间作，现为进一步中西医结合治疗，遂入本院求治，病程中无发热、无意识丧失，无四肢抽搐，无大小便失禁。入院症状：神志清晰，精神欠佳，头晕、昏沉时作，行走不稳感，颈肩部酸痛，右手手指麻木，骶尾部酸痛，无耳鸣耳聋，无视物旋转，无恶心干呕，纳食一般，夜寐一般，大便如常，小便正常，舌暗淡，苔白腻，脉濡。\\ndetection: 神志清晰，精神尚可，形体适中，语言清晰，口唇红润；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌暗淡，苔白腻，脉濡。\\nnorm_syndrome: 痰湿蒙窍证\", \"document_name\": \"train\", \"dataset_name\": \"中医\", \"word_count\": 437, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}, {\"segment_id\": \"5d56730d-0b63-4a2e-999e-a14e734719c9\", \"document_id\": \"fdb0df21-8ac1-44be-ae83-cdf6b365fe87\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.49846455454826355, \"content\": \"user_id: 466414\\nlcd_id: BNG070\\nlcd_name: 眩晕病\\nsyndrome: 痰湿蒙窍证\\nchief_complaint: 头晕昏沉、头痛间作5日\\ndescription: 患者于5日前，乘坐公交车过程中无明显诱因，出现头晕昏沉，头痛，无恶心干呕，时有心慌不适，休息后症状仍有头痛不适，现为进一步中西医结合治疗，遂入本院求治，病程中无发热、无意识丧失，无四肢抽搐，无大小便失禁。入院症状：神志清晰，精神欠佳，头晕、昏沉时作，前额部胀痛不适，无视物旋转，无恶心干呕，时有心慌不适，自觉自胸腹部有气上冲感，双侧髋关节酸痛，行走时加重，纳食一般，夜寐一般，大便如常，小便正常，舌暗淡，苔白腻，脉濡。\\ndetection: 神志清晰，精神欠佳，形体偏胖，语言清晰，口唇发绀；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌暗淡，苔白腻，脉濡。\\nnorm_syndrome: 痰湿蒙窍证\", \"document_name\": \"train\", \"dataset_name\": \"中医\", \"word_count\": 477, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}, {\"segment_id\": \"bf39d009-e9d1-4253-872e-76b57f789a63\", \"document_id\": \"fdb0df21-8ac1-44be-ae83-cdf6b365fe87\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.49527373909950256, \"content\": \"user_id: 459942\\nlcd_id: BNG070\\nlcd_name: 眩晕病\\nsyndrome: 风痰上扰证\\nchief_complaint: 头晕、头昏沉5天。\\ndescription: 患者5天前无名明显诱因出现头晕，昏沉不适，症状持续无缓解，为明确诊治，今至我院，门诊以“眩晕”收入我科。入院时症状：神志清，精神欠佳，头晕，头昏沉不适，无视物旋转，无恶心、呕吐，自觉记忆力较前下降，对答基本正常，饮食尚可，二便可，夜寐尚可。舌质淡紫，苔白腻，脉弦。\\ndetection: 神志清晰，精神欠佳，形体适中，语言清晰，口唇红润；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌质淡紫，苔白腻，脉弦。\\nnorm_syndrome: 风痰上扰证\", \"document_name\": \"train\", \"dataset_name\": \"中医\", \"word_count\": 399, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}, {\"segment_id\": \"c3ad05cc-e3aa-4168-a3ca-cffccb16c38a\", \"document_id\": \"ef6a416f-1bc9-4e1f-ac42-f57f077d16cb\", \"dataset_id\": \"5d84496b-d29b-41d4-93f7-82c4f39569d1\", \"score\": 0.49342766404151917, \"content\": \"user_id: 490275\\nlcd_id: A17.07\\nlcd_name: 眩晕\\nsyndrome: 痰浊上扰证\\nchief_complaint: 头昏头昏沉半月\\ndescription: 患者半月前无明显诱因突发头晕头昏沉，伴有头痛，视物模糊，严重时影响夜间入睡，未就诊，自觉症状持续不缓解，自测血压145/95mmHg,今为求中西医结合治疗，遂来我院。病程中神清，精神萎靡，头晕、头昏沉，伴头痛，无一过性黑朦，无视物旋转，无恶心呕吐，无活动后胸闷心慌，无腹痛腹胀，纳可，夜寐欠佳，大小便正常。\\ndetection: 神志清晰，精神欠佳，形体适中，语言清晰，口唇红润；皮肤正常，无斑疹。头颅大小形态正常，无目窼下陷，白睛无黄染，耳轮正常，无耳瘘及生疮；颈部对称，无青筋暴露，无瘿瘤瘰疬，胸部对称，虚里搏动正常，腹部平坦，无癥瘕痞块，爪甲色泽红润，双下肢无浮肿，舌暗，苔白，脉细。\\nnorm_syndrome: 风痰入络证\", \"document_name\": \"dev\", \"dataset_name\": \"中医\", \"word_count\": 414, \"original_chunk_id\": null, \"original_chunk_offset\": 0.0}]}"
+            },
+            "usage": {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "type": "chatflow"
+            }
+        }
+    ]
+}
