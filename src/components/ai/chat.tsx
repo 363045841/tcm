@@ -356,6 +356,8 @@ const HelloWorld = defineComponent({
           }
         );
         const socket = socketService.connect("http://139.196.234.35:3001");
+        
+        // const socket = socketService.connect("http://localhost:3001")
         socket.on("receiveMessage", async (chunk: string) => {
           try {
             let res = JSON.parse(chunk);

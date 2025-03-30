@@ -14,7 +14,7 @@
     const outputDiv = document.getElementById('output');
 
     // 创建 WebSocket 连接
-    const socket = io('http://139.196.234.35:3001'); // 替换为你的后端地址
+    const socket = io('http://localhost:3001'); // 替换为你的后端地址
 
     // 监听服务器推送的数据
     socket.on('receiveMessage', (chunk) => {

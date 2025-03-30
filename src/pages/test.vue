@@ -1,13 +1,11 @@
 <template>
-
+    <h1>Test</h1>
 </template>
 
-<script setup lang='ts' name=''>
-import { ref, reactive} from 'vue' 
-import { getMedicineRelation } from '@/utils/useGetMedicineRelation'
+<script setup lang='ts'>
 
-let a = await getMedicineRelation(1)
-console.log(a)
+
+console.log('env', import.meta.env)
 
 </script>
 <style scoped>
