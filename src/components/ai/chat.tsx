@@ -36,6 +36,7 @@ import thought from "./thought.vue";
 import socketService from "@/services/socket.service";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
+import { io } from "socket.io-client";
 
 interface Outputs {
   references: any[];
@@ -355,8 +356,15 @@ const HelloWorld = defineComponent({
             }),
           }
         );
-        const socket = socketService.connect("http://139.196.234.35:3001");
-        
+        const socket = io("wss://139.196.234.35", {
+          // 使用外部已声明的 socket 变量
+          path: "/socket.io",
+          autoConnect: false,
+          transports: ["websocket"],
+        });
+
+        socket.connect();
+
         // const socket = socketService.connect("http://localhost:3001")
         socket.on("receiveMessage", async (chunk: string) => {
           try {

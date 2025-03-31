@@ -7,7 +7,15 @@ class SocketService {
 
   connect(url) {
     if (!this.socket) {
-      this.socket = io(url, { transports: ['websocket'] }); // 强制使用 WebSocket 协议
+      // 强制使用 WebSocket 协议
+      this.socket = io(url, {
+        transports: ['websocket'],
+        path: '/socket.io', // 路径可以根据你的后端配置来调整
+        autoConnect: false, // 不自动连接
+      });
+
+      // 连接 WebSocket
+      this.socket.connect(); 
     }
     return this.socket;
   }
