@@ -339,6 +339,7 @@ const HelloWorld = defineComponent({
           zhiliaofangfa: string;
           jibing: string;
         }
+
         RAGdoc.value.length = 0;
         let res = await fetch(
           `${import.meta.env.VITE_IP}:${
@@ -357,15 +358,13 @@ const HelloWorld = defineComponent({
           }
         );
         const socket = io("wss://139.196.234.35", {
-          // 使用外部已声明的 socket 变量
           path: "/socket.io",
           autoConnect: false,
           transports: ["websocket"],
         });
-
+        // const socket = socketService.connect("http://localhost:3001")
         socket.connect();
 
-        // const socket = socketService.connect("http://localhost:3001")
         socket.on("receiveMessage", async (chunk: string) => {
           try {
             let res = JSON.parse(chunk);

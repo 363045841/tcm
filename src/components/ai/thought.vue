@@ -1,5 +1,4 @@
 <script setup lang="tsx">
-import { eventBus } from '@/utils/eventBus';
 import { CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue';
 import { Card } from 'ant-design-vue';
 import { ThoughtChain, ThoughtChainItem, type ThoughtChainProps } from 'ant-design-x-vue';
