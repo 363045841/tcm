@@ -4,11 +4,14 @@ import {
   type AttachmentsProps,
   Bubble,
   type BubbleListProps,
+  BubbleProps,
   Conversations,
   type ConversationsProps,
   Prompts,
   type PromptsProps,
   Sender,
+  Suggestion,
+  SuggestionProps,
   Welcome,
   useXAgent,
   useXChat,
@@ -30,13 +33,11 @@ import {
   SyncOutlined,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import { Badge, Button, Card, Space, theme } from "ant-design-vue";
-import thought from "./thought.vue";
-
-import socketService from "@/services/socket.service";
+import { Badge, Button, Space, theme, Typography } from "ant-design-vue";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
 import { io } from "socket.io-client";
+import markdownit from "markdown-it";
 
 interface Outputs {
   references: any[];
@@ -64,31 +65,7 @@ interface ResponseData {
   content: Content[];
 }
 
-const HelloWorld = defineComponent({
-  data() {
-    return {
-      socketMessageAnswer: [] as string[],
-    };
-  },
-  mounted() {
-    /* const socket = socketService.connect("http://139.196.234.35:3001");
-
-    socket.on("receiveMessage", (chunk: any) => {
-      this.socketMessageAnswer.push(chunk); // 将接收到的数据添加到 messages 数组
-      console.log(chunk);
-    });
-
-    // 监听连接成功事件
-    socket.on("connect", () => {
-      console.log("WebSocket 连接成功");
-    });
-
-    // 监听错误事件
-    socket.on("error", (error: any) => {
-      console.error("WebSocket 错误:", error);
-    }); */
-  },
-
+const Chat = defineComponent({
   setup() {
     const agentRequestLoading = ref(false);
     const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
@@ -448,7 +425,6 @@ const HelloWorld = defineComponent({
       // 调用请求模型的hook
       // console.log('value',messages.value)
       content.value = "";
-      // console.log("发送完毕", messages.value);
     };
 
     const onPromptsItemClick: PromptsProps["onItemClick"] = (info) => {
@@ -509,6 +485,7 @@ const HelloWorld = defineComponent({
         key: id,
         loading: status === "loading",
         role: status === "local" ? "local" : "ai",
+        messageRender: renderMarkdown,
         content: message,
       }))
     );
@@ -525,7 +502,7 @@ const HelloWorld = defineComponent({
 
     const senderHeader = computed(() => (
       <Sender.Header
-        title="Attachments"
+        title="文件"
         open={headerOpen.value}
         onOpenChange={(open) => (headerOpen.value = open)}
         styles={{
@@ -543,8 +520,8 @@ const HelloWorld = defineComponent({
               ? { title: "Drop file here" }
               : {
                   icon: <CloudUploadOutlined />,
-                  title: "Upload files",
-                  description: "Click or drag files to this area to upload",
+                  title: "上传文件",
+                  description: "点击或拖拽文件到此处上传",
                 }
           }
         />
@@ -562,6 +539,29 @@ const HelloWorld = defineComponent({
         <span style={styles.value['logo-span']}>Ant Design X Vue</span>
       </div>
     )); */
+    const md = markdownit({ html: true, breaks: true });
+    const text = `
+> Render as markdown content to show rich text!
+
+Link: [Ant Design X](https://x.ant.design)
+`.trim();
+    const renderMarkdown: BubbleProps["messageRender"] = (content) => (
+      <Typography>
+        <div v-html={md.render(content)} />
+      </Typography>
+    );
+    const renderKey = ref(0);
+    
+    type SuggestionItems = Exclude<SuggestionProps['items'], () => void>;
+    const suggestions: SuggestionItems = [
+      { label: 'Write a report', value: 'report' },
+      { label: 'Draw a picture', value: 'draw' },
+      {
+        label: 'Check some knowledge',
+        value: 'knowledge',
+        extra: 'Extra Info',
+      },
+    ];
 
     return () => (
       <div style={styles.value.layout}>
@@ -598,27 +598,72 @@ const HelloWorld = defineComponent({
             value={content.value}
             header={senderHeader.value}
             onSubmit={onSubmit}
-            onChange={(value) => (content.value = value)}
+            onChange={(nextVal) => {
+              if (nextVal.at(-1) === "@") {
+                alert("输入 / 后，按 Tab 键选择功能");
+                renderKey.value++;
+                return;
+              }
+              content.value = nextVal;
+            }}
             prefix={attachmentsNode.value}
             loading={agentRequestLoading.value}
             style={styles.value.sender}
+            placeholder="输入 @ 调用工具"
           />
-          {/* <Thought
-            isComplete={!agentRequestLoading.value}
-            ragList={RAGdoc.value}
-          ></Thought> */}
-          {/* <button
-            onClick={() => {
-              isCompletion.value = !isCompletion.value;
-              console.log(isCompletion.value);
+          <Suggestion
+            items={suggestions}
+            onSelect={(itemVal) => {
+              content.value = `[${itemVal}]:`;
             }}
-          >
-            change
-          </button> */}
+            block
+            children={({ onTrigger, onKeyDown }) => {
+              return (
+                <Sender
+                  value={content.value}
+                  onChange={(nextVal) => {
+                    if (nextVal === "/") {
+                      onTrigger();
+                    } else if (!nextVal) {
+                      onTrigger(false);
+                    }
+                    content.value = nextVal;
+                  }}
+                  onKeyDown={onKeyDown}
+                  placeholder="输入 / 获取建议"
+                />
+              );
+            }}
+          />
+          {/* 测试用: */}
+          {/* <div style={{ height: 100 }} key={renderKey.value}>
+            <Bubble
+              typing
+              content={text}
+              messageRender={renderMarkdown}
+              avatar={{ icon: <UserOutlined /> }}
+            />
+            <button
+              onClick={() => {
+                messages.value.push({
+                  id: Date.now(),
+                  message: text,
+                  status: "ai",
+                });
+                console.log('messages',messages.value)
+                setTimeout(() => {
+                  messages.value[messages.value.length - 1].message += '这是**一段**新的内容，用于测试消息的动态更新。'
+                  alert('消息已更新！')
+                }, 3000);
+              }}
+            >
+              Push Message
+            </button>
+          </div> */}
         </div>
       </div>
     );
   },
 });
 
-export default HelloWorld;
+export default Chat;

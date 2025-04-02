@@ -25,6 +25,7 @@ declare module 'vue-router/auto-routes' {
     '/item/etcm/[name]': RouteRecordInfo<'/item/etcm/[name]', '/item/etcm/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/item/etcm/guji/[name]': RouteRecordInfo<'/item/etcm/guji/[name]', '/item/etcm/guji/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/list': RouteRecordInfo<'/list', '/list', Record<never, never>, Record<never, never>>,
+    '/md': RouteRecordInfo<'/md', '/md', Record<never, never>, Record<never, never>>,
     '/test': RouteRecordInfo<'/test', '/test', Record<never, never>, Record<never, never>>,
   }
 }
