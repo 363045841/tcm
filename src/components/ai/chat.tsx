@@ -270,12 +270,25 @@ const Chat = defineComponent({
       </Sender.Header>
     ));
 
+    // 消息markdown渲染逻辑
     const md = markdownit({ html: true, breaks: true });
     const renderMarkdown: BubbleProps["messageRender"] = (content) => (
       <Typography>
         <div v-html={md.render(content)} />
       </Typography>
     );
+
+    // Suggestion 相关逻辑
+    type SuggestionItems = Exclude<SuggestionProps["items"], () => void>;
+    const suggestions: SuggestionItems = [
+      { label: "中医症型判断", value: "症型判断" },
+      { label: "Draw a picture", value: "draw" },
+      {
+        label: "Check some knowledge",
+        value: "knowledge",
+        extra: "Extra Info",
+      },
+    ];
 
     // 事件处理
     const onAddConversation = () => {
@@ -318,10 +331,27 @@ const Chat = defineComponent({
         });
         agentRequestLoading.value = true;
 
+        // 第一个 fetch 请求：创建对话
         let conversationInfo = await fetch(
           `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/aimessage/create`,
           { method: "POST" }
         ).then((res) => res.json());
+
+        // 第二个 fetch 请求：获取聊天内容
+        let res = await fetch(
+          `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/aimessage/chat`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: message,
+              conversation_id: conversationInfo.conversation_id,
+              stream: true,
+            }),
+          }
+        );
 
         const socket = io("wss://139.196.234.35", {
           path: "/socket.io",
@@ -413,22 +443,34 @@ const Chat = defineComponent({
             roles={roles}
             style={styles.value.messages}
           ></Bubble.List>
-          <Sender
-            value={content.value}
-            header={senderHeader.value}
-            onSubmit={onSubmit}
-            onChange={(nextVal) => {
-              if (nextVal.at(-1) === "@") {
-                alert("输入 / 后，按 Tab 键选择功能");
-                renderKey.value++;
-                return;
-              }
-              content.value = nextVal;
+          <Suggestion
+            items={suggestions}
+            onSelect={(itemVal) => {
+              content.value = `[${itemVal}]:` + content.value.slice(0, content.value.length - 1);
             }}
-            prefix={attachmentsNode.value}
-            loading={agentRequestLoading.value}
-            style={styles.value.sender}
-            placeholder="输入 @ 调用工具"
+            block
+            children={({ onTrigger, onKeyDown }) => {
+              return (
+                <Sender
+                  value={content.value}
+                  onChange={(nextVal) => {
+                    if (nextVal.at(-1) === "@") {
+                      onTrigger();
+                    } else if (!nextVal) {
+                      onTrigger(false);
+                    }
+                    content.value = nextVal;
+                  }}
+                  onKeyDown={onKeyDown}
+                  placeholder="输入 @ 调用工具"
+                  onSubmit={onSubmit}
+                  prefix={attachmentsNode.value}
+                  loading={agentRequestLoading.value}
+                  style={styles.value.sender}
+                  header={senderHeader.value}
+                />
+              );
+            }}
           />
         </div>
       </div>
