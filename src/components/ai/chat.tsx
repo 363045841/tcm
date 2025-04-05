@@ -23,6 +23,7 @@ import {
   DislikeOutlined,
   EllipsisOutlined,
   FireOutlined,
+  FontSizeOutlined,
   HeartOutlined,
   LikeOutlined,
   PaperClipOutlined,
@@ -33,7 +34,7 @@ import {
   SyncOutlined,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import { Badge, Button, Space, theme, Typography } from "ant-design-vue";
+import { Badge, Button, Space, Tag, theme, Typography } from "ant-design-vue";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
 import { io } from "socket.io-client";
@@ -63,6 +64,11 @@ interface ResponseData {
   content: Content[];
 }
 
+interface tool_tag {
+  tool_name: string;
+  tool_id: number;
+}
+
 const Chat = defineComponent({
   setup() {
     // 状态管理
@@ -70,14 +76,16 @@ const Chat = defineComponent({
     const isCompletion = ref(true);
     const headerOpen = ref(false);
     const content = ref(""); // 输入框内容
-    const conversationsItems = ref([
-      { key: "0", label: "新对话" },
-    ]); // 左侧对话列表
+    const conversationsItems = ref([{ key: "0", label: "新对话" }]); // 左侧对话列表
     const activeKey = ref("0");
     const attachedFiles = ref<AttachmentsProps["items"]>([]);
     const RAGdoc = ref<string[]>([]);
     const thoughtKey = ref(0);
     const renderKey = ref(0);
+    let usingTools = ref<tool_tag[]>([
+      { tool_name: "RAG", tool_id: 1 },
+      { tool_name: "证型判断", tool_id: 2 },
+    ]);
 
     // 样式管理
     const { token } = theme.useToken();
@@ -106,7 +114,7 @@ const Chat = defineComponent({
       chat: {
         height: "100%",
         width: "100%",
-        "max-width": "700px",
+        "max-width": "900px",
         margin: "0 auto",
         "box-sizing": "border-box",
         display: "flex",
@@ -161,7 +169,10 @@ const Chat = defineComponent({
     const placeholderPromptsItems: PromptsProps["items"] = [
       {
         key: "1",
-        label: renderTitle(<FireOutlined style={{ color: "#FF4D4F" }} />, "Hot Topics"),
+        label: renderTitle(
+          <FireOutlined style={{ color: "#FF4D4F" }} />,
+          "Hot Topics"
+        ),
         description: "What are you interested in?",
         children: [
           { key: "1-1", description: `What's new in X?` },
@@ -171,18 +182,37 @@ const Chat = defineComponent({
       },
       {
         key: "2",
-        label: renderTitle(<ReadOutlined style={{ color: "#1890FF" }} />, "Design Guide"),
+        label: renderTitle(
+          <ReadOutlined style={{ color: "#1890FF" }} />,
+          "Design Guide"
+        ),
         description: "How to design a good product?",
         children: [
           { key: "2-1", icon: <HeartOutlined />, description: `Know the well` },
-          { key: "2-2", icon: <SmileOutlined />, description: `Set the AI role` },
-          { key: "2-3", icon: <CommentOutlined />, description: `Express the feeling` },
+          {
+            key: "2-2",
+            icon: <SmileOutlined />,
+            description: `Set the AI role`,
+          },
+          {
+            key: "2-3",
+            icon: <CommentOutlined />,
+            description: `Express the feeling`,
+          },
         ],
       },
     ];
     const senderPromptsItems: PromptsProps["items"] = [
-      { key: "1", description: "Hot Topics", icon: <FireOutlined style={{ color: "#FF4D4F" }} /> },
-      { key: "2", description: "Design Guide", icon: <ReadOutlined style={{ color: "#1890FF" }} /> },
+      {
+        key: "1",
+        description: "Hot Topics",
+        icon: <FireOutlined style={{ color: "#FF4D4F" }} />,
+      },
+      {
+        key: "2",
+        description: "Design Guide",
+        icon: <ReadOutlined style={{ color: "#1890FF" }} />,
+      },
     ];
 
     const roles = computed<BubbleListProps["roles"]>(() => ({
@@ -190,7 +220,12 @@ const Chat = defineComponent({
         placement: "start",
         typing: { step: 5, interval: 20 },
         avatar: { icon: <UserOutlined />, style: { background: "#fde3cf" } },
-        header: <Thought isComplete={!agentRequestLoading.value} ragList={RAGdoc.value} />,
+        header: (
+          <Thought
+            isComplete={!agentRequestLoading.value}
+            ragList={RAGdoc.value}
+          />
+        ),
         shape: "corner",
         footer: (
           <Space size="small">
@@ -239,6 +274,24 @@ const Chat = defineComponent({
           icon={<PaperClipOutlined />}
           onClick={() => (headerOpen.value = !headerOpen.value)}
         />
+        {usingTools.value.map((tool: tool_tag) => {
+          return (
+            <Tag
+              key={tool.tool_id}
+              style={{
+                background: "#f5f7ff",
+                color: "#3a5cff",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                borderRadius: "16px",
+                padding: "6px 12px",
+              }}
+            >
+              @{tool.tool_name}
+            </Tag>
+          );
+        })}
       </Badge>
     ));
 
@@ -281,7 +334,7 @@ const Chat = defineComponent({
     // Suggestion 相关逻辑
     type SuggestionItems = Exclude<SuggestionProps["items"], () => void>;
     const suggestions: SuggestionItems = [
-      { label: "中医症型判断", value: "症型判断" },
+      { label: "症型判断", value: "症型判断" },
       { label: "Draw a picture", value: "draw" },
       {
         label: "Check some knowledge",
@@ -333,12 +386,14 @@ const Chat = defineComponent({
 
         // 第一个 fetch 请求：创建对话
         let conversationInfo = await fetch(
-          `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/aimessage/create`,
+          `${import.meta.env.VITE_IP}:${
+            import.meta.env.VITE_BACKEND_PORT
+          }/api/v1/aimessage/create`,
           { method: "POST" }
         ).then((res) => res.json());
 
         // 第二个 fetch 请求：获取聊天内容
-        let res = await fetch(
+        /* let res = await fetch(
           `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/aimessage/chat`,
           {
             method: "POST",
@@ -391,7 +446,7 @@ const Chat = defineComponent({
 
         socket.on("error", (error: any) => {
           console.error("WebSocket 错误:", error);
-        });
+        }); */
       },
     });
 
@@ -446,7 +501,12 @@ const Chat = defineComponent({
           <Suggestion
             items={suggestions}
             onSelect={(itemVal) => {
-              content.value = `[${itemVal}]:` + content.value.slice(0, content.value.length - 1);
+              usingTools.value.push({
+                tool_name: itemVal,
+                tool_id: usingTools.value.length + 1,
+              });
+              content.value = content.value.slice(0, content.value.length - 1);
+
             }}
             block
             children={({ onTrigger, onKeyDown }) => {
@@ -461,7 +521,18 @@ const Chat = defineComponent({
                     }
                     content.value = nextVal;
                   }}
-                  onKeyDown={onKeyDown}
+                  onKeyDown={(event) => {
+                    if (event.key === "Backspace") {
+                      if(content.value.length === 0){
+                        if(usingTools.value.length > 0) {
+                          usingTools.value.pop();
+                      }
+                    }
+                    // 自定义逻辑：例如按下 Backspace 键时打印日志
+                    
+                    // 调用父级的 onKeyDown
+                    onKeyDown;
+                  }}}
                   placeholder="输入 @ 调用工具"
                   onSubmit={onSubmit}
                   prefix={attachmentsNode.value}
