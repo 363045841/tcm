@@ -64,7 +64,7 @@ interface ResponseData {
   content: Content[];
 }
 
-interface tool_tag {
+export interface tool_tag {
   tool_name: string;
   tool_id: number;
 }
@@ -80,12 +80,7 @@ const Chat = defineComponent({
     const activeKey = ref("0");
     const attachedFiles = ref<AttachmentsProps["items"]>([]);
     const RAGdoc = ref<string[]>([]);
-    const thoughtKey = ref(0);
-    const renderKey = ref(0);
-    let usingTools = ref<tool_tag[]>([
-      { tool_name: "RAG", tool_id: 1 },
-      { tool_name: "证型判断", tool_id: 2 },
-    ]);
+    let usingTools = ref<tool_tag[]>([]);
 
     // 样式管理
     const { token } = theme.useToken();
@@ -224,6 +219,7 @@ const Chat = defineComponent({
           <Thought
             isComplete={!agentRequestLoading.value}
             ragList={RAGdoc.value}
+            usingTools={usingTools.value}
           />
         ),
         shape: "corner",
@@ -334,13 +330,9 @@ const Chat = defineComponent({
     // Suggestion 相关逻辑
     type SuggestionItems = Exclude<SuggestionProps["items"], () => void>;
     const suggestions: SuggestionItems = [
-      { label: "症型判断", value: "症型判断" },
-      { label: "Draw a picture", value: "draw" },
-      {
-        label: "Check some knowledge",
-        value: "knowledge",
-        extra: "Extra Info",
-      },
+      { label: "证型判断", value: "证型判断" },
+      { label: "组方库", value: "组方库" },
+      { label: "药材库", value: "药材库" },
     ];
 
     // 事件处理
@@ -506,7 +498,6 @@ const Chat = defineComponent({
                 tool_id: usingTools.value.length + 1,
               });
               content.value = content.value.slice(0, content.value.length - 1);
-
             }}
             block
             children={({ onTrigger, onKeyDown }) => {
@@ -523,16 +514,17 @@ const Chat = defineComponent({
                   }}
                   onKeyDown={(event) => {
                     if (event.key === "Backspace") {
-                      if(content.value.length === 0){
-                        if(usingTools.value.length > 0) {
+                      if (content.value.length === 0) {
+                        if (usingTools.value.length > 0) {
                           usingTools.value.pop();
+                        }
                       }
+                      // 自定义逻辑：例如按下 Backspace 键时打印日志
+
+                      // 调用父级的 onKeyDown
+                      onKeyDown;
                     }
-                    // 自定义逻辑：例如按下 Backspace 键时打印日志
-                    
-                    // 调用父级的 onKeyDown
-                    onKeyDown;
-                  }}}
+                  }}
                   placeholder="输入 @ 调用工具"
                   onSubmit={onSubmit}
                   prefix={attachmentsNode.value}

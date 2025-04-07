@@ -1,13 +1,15 @@
 <script setup lang="tsx">
 import { CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue';
-import { Card } from 'ant-design-vue';
+import { Card, Tag } from 'ant-design-vue';
 import { ThoughtChain, ThoughtChainItem, type ThoughtChainProps } from 'ant-design-x-vue';
 import { defineProps, ref, watchEffect } from 'vue';
+import { tool_tag } from './chat';
 
 // 直接声明 ragList 为 Ref 类型
 let props = defineProps<{
   ragList: string[];  // ragList 直接作为一个数组类型传入
-  isComplete : boolean;
+  isComplete: boolean;
+  usingTools: tool_tag[];
 }>();
 
 
@@ -34,6 +36,35 @@ function getStatusIcon(status: ThoughtChainItem['status']) {
 
 // 更新 items 以包含 ragList
 const items = computed<ThoughtChainProps['items']>(() => [
+  ...(props.usingTools.length > 0
+    ? [{
+      title: '使用工具',
+      status: 'success',
+      description: (
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {props.usingTools.map((tool: tool_tag) => (
+            <Tag
+              key={tool.tool_id}
+              style={{
+                background: "#f5f7ff",
+                color: "#3a5cff",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                borderRadius: "16px",
+                padding: "6px 12px",
+                margin: "10px 0 0 0"
+              }}
+            >
+              @{tool.tool_name}
+            </Tag>
+          ))}
+        </div>
+      ),
+      icon: getStatusIcon('success'),
+    } as ThoughtChainItem]
+
+    : []),
   {
     title: '检索知识库',
     status: 'success',
