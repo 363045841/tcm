@@ -19,6 +19,9 @@ dotenv.config();
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    Vue({
+      template: { transformAssetUrls },  // Vue插件要放最前面
+    }),
     VueRouter({
       dts: "src/typed-router.d.ts",
     }),
@@ -34,19 +37,14 @@ export default defineConfig({
       eslintrc: {
         enabled: true,
       },
-      vueTemplate: true,
     }),
     Components({
       dts: "src/components.d.ts",
     }),
-    Vue({
-      template: { transformAssetUrls },
-    }),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
     Vuetify({
       autoImport: true,
       styles: {
-        configFile: "src/styles/settings.scss",
+        configFile: "src/styles/settings.scss",  // 确保此路径正确
       },
     }),
     vueJsx(),
@@ -61,6 +59,7 @@ export default defineConfig({
       },
     }),
   ],
+  
   define: { "process.env": {} },
   resolve: {
     alias: {

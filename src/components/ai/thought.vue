@@ -70,18 +70,21 @@ const items = computed<ThoughtChainProps['items']>(() => [
     status: 'success',
     description: `召回了 ${props.ragList.length} 条相关切片`,
     icon: getStatusIcon('success'),
-    content: (
-      <div style={{ height: '40vh', maxHeight: '40vh', overflowY: 'auto' }}>
-        {props.ragList.map((item, index) => (
-          <div key={index}>
-            <span style={{ fontWeight: 'bold' }}>{index + 1}. </span>
-            <p style={{ display: 'inline' }}>{item}</p>
-            <br />
-          </div>
-        ))}
-      </div>
-    ),
+    content: props.ragList.length > 0
+      ? (
+        <div style={{ height: '40vh', maxHeight: '40vh', overflowY: 'auto' }}>
+          {props.ragList.map((item, index) => (
+            <div key={index}>
+              <span style={{ fontWeight: 'bold' }}>{index + 1}. </span>
+              <p style={{ display: 'inline' }}>{item}</p>
+              <br />
+            </div>
+          ))}
+        </div>
+      )
+      : undefined,
   },
+
   {
     title: props.isComplete ? '总结完毕' : '模型总结中',
     status: props.isComplete ? 'success' : 'pending',

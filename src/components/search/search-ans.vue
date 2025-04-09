@@ -295,19 +295,15 @@ let isFirstSearchStore = useComponentsSearchItemStore();
 watch(
   () => props.searchText,
   async (val) => {
-    // console.log("watching", val);
     if (isFirstSearchStore.isFirstSearch || val === "") {
-      //console.log(isFirstSearchStore.isFirstSearch, val);
       isFirstSearchStore.isFirstSearch = false;
       // 渲染历史记录
       filteredItems.value = dataStore.historyAlertTitle;
-      //console.log("historyListVList", historyListVList);
       historyListVList = JSON.parse(
         localStorage.getItem("historyList") || "[]"
       );
     } else {
       isFirstSearchStore.isFirstSearch = false;
-      // console.log("发起搜索", val);
       await debouncedWatchHandler(val); // 调用防抖函数
     }
   },
