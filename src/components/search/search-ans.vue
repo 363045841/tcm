@@ -11,14 +11,14 @@
           title: item.title,
         })
         ">
+      {{ console.log(item) }}
       <template v-if="!item.isETCM && !item.isETCMHerbs && item.id !== 0" #prepend>
-        {{ console.log(`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${item.id}.jpg`) }}
         <img :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${item.id}.jpg`"
           class="circle-image" style="width: 40px; height: 40px; margin-right: 15px;">{{ console.log('123', item.avatar)
           }}
         </img>
       </template>
-      
+
       <template #title>
         <div style="display: flex; justify-content: space-between; width: 100%">
           <div v-if="item.title.indexOf(searchText) !== -1">
@@ -46,24 +46,27 @@
       </template>
 
       <template #subtitle>
-        <div v-if="item.subtitle.indexOf(searchText) !== -1">
+        <div v-if="item.subtitle && item.subtitle.indexOf(searchText) !== -1">
           <span>{{
             item.subtitle.substring(0, item.subtitle.indexOf(searchText))
-          }}</span>
+            }}</span>
           <b>{{
             item.subtitle.substring(
               item.subtitle.indexOf(searchText),
               item.subtitle.indexOf(searchText) + searchText.length
             )
-          }}</b>
+            }}</b>
           <span>{{
             item.subtitle.substring(
               item.subtitle.indexOf(searchText) + searchText.length
             )
-          }}</span>
+            }}</span>
         </div>
-        <div v-else>{{ item.subtitle }}</div>
+        <div v-else>
+          {{ item.subtitle || '' }}
+        </div>
       </template>
+
     </v-list-item>
 
     <div class="sticky-footer" style="
@@ -234,17 +237,19 @@ const debouncedWatchHandler = debounce(
         title: word,
       });
     }
-    for (let word of templist.ETCM) {
-      dataStore.title.push({
-        id: word.id,
-        title: word.recipeName,
-        subtitle: word.prescriptionIngredients,
-        avatar: `${word.id}.jpg}`,
-        fuzzyWord: `https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${word.id}`,
-        isFuzzy: false,
-        isETCM: true,
-        isETCMHerbs: false,
-      })
+    if (templist.ETCM) {
+      for (let word of templist.ETCM) {
+        dataStore.title.push({
+          id: word.id,
+          title: word.recipeName,
+          subtitle: word.prescriptionIngredients,
+          avatar: `${word.id}.jpg}`,
+          fuzzyWord: `https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${word.id}`,
+          isFuzzy: false,
+          isETCM: true,
+          isETCMHerbs: false,
+        })
+      }
     }
     for (let word of templist.ETCMHerbs) {
       dataStore.title.push({
@@ -281,7 +286,7 @@ const debouncedWatchHandler = debounce(
     // console.log("fuzzy搜索结果：", FuzzySearchResStore.searchShow);
     filteredItems.value = dataStore.title;
 
-    dataStore.computeStrongRange(query);
+    // dataStore.computeStrongRange(query);
   },
   500 // 防抖延时
 );

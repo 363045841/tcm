@@ -77,7 +77,7 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
   }),
   getters: {},
   actions: {
-    computeStrongRange(query: string) {
+    /* computeStrongRange(query: string) {
       this.strongTitle.clear(); // 清空 Map
       this.strongSubTitle.clear(); // 清空 Map
 
@@ -100,6 +100,6 @@ export const useComponentsSearchItemStore = defineStore("searchItem", {
         }
       }
       //console.log(1, toRaw(Array.from(this.strongTitle.entries())));
-    },
+    }, */
   },
 });
