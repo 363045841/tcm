@@ -73,7 +73,7 @@ async function fetchCards(newPage: number) {
   const end = newPage * itemsPerPage
 
   try {
-    const res = await fetch(`http://139.196.234.35/api/v1/show-all?begin=${begin}&end=${end}`)
+    const res = await fetch(`${import.meta.env.VITE_IP}/api/v1/show-all?begin=${begin}&end=${end}`)
     const data = await res.json()
 
     showCardArray.value = data.map((item: cardInfo) => ({
