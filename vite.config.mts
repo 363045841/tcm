@@ -69,9 +69,16 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      '/api': {
+        target: 'https://www.zyysjk.xyz', // 目标服务器
+        changeOrigin: true
+      }
+    }
   },
   base: "/",
   build: {
     outDir: process.env.VITE_OUT_PATH,
   },
+  
 });

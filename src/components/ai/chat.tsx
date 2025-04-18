@@ -37,7 +37,6 @@ import {
 import { Badge, Button, Space, Tag, theme, Typography } from "ant-design-vue";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
-import { io } from "socket.io-client";
 import markdownit from "markdown-it";
 
 interface Outputs {
@@ -385,8 +384,10 @@ const Chat = defineComponent({
         ).then((res) => res.json());
 
         // 第二个 fetch 请求：获取聊天内容
-        /* let res = await fetch(
-          `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/aimessage/chat`,
+        /*  let res = await fetch(
+          `${import.meta.env.VITE_IP}:${
+            import.meta.env.VITE_BACKEND_PORT
+          }/api/v1/aimessage/chat`,
           {
             method: "POST",
             headers: {
@@ -398,47 +399,54 @@ const Chat = defineComponent({
               stream: true,
             }),
           }
+        ); */
+        console.log(
+          `/api/v1/aimessage/stream?message=${message}&conversation_id=${conversationInfo.conversation_id}`
+        );
+        const eventSource = new EventSource(
+          `/api/v1/chat/stream?message=${message}&conversation_id=${conversationInfo.conversation_id}`
         );
 
-        const socket = io("wss://139.196.234.35", {
-          path: "/socket.io",
-          autoConnect: false,
-          transports: ["websocket"],
-        });
-        socket.connect();
-
-        socket.on("receiveMessage", async (chunk: string) => {
+        eventSource.onmessage = (event) => {
           try {
-            let res = JSON.parse(chunk);
-            if (res.is_completion) {
+            let SSEchunk:
+              | { message: string }
+              | { is_complete: boolean; answer: string } = JSON.parse(
+              event.data
+            );
+            console.log(SSEchunk);
+            if ("message" in SSEchunk) {
+              let res: ResponseData = JSON.parse(SSEchunk.message);
+              messages.value[messages.value.length - 1].message += res.answer;
+
+              if (
+                "message_type" in res.content[0].outputs &&
+                res.content[0].outputs.message_type === "json"
+              ) {
+                const RAGdata = JSON.parse(res.content[0].outputs.message);
+                (RAGdata.RAGreference as any[]).forEach((item) => {
+                  RAGdoc.value.push(item.content as string);
+                });
+              }
+
+              messages.value[messages.value.length - 1].status = "success";
+            } else if ("is_complete" in SSEchunk && SSEchunk.is_complete) {
+              console.log("SSE断开连接");
               eventBus.emit("updateRAGCard", true);
+
               agentRequestLoading.value = false;
-              socket.close();
+
+              eventSource.close();
             }
-            messages.value[messages.value.length - 1].message += res.answer;
-            if (
-              "message_type" in res.content[0].outputs &&
-              res.content[0].outputs.message_type === "json"
-            ) {
-              let RAGdata = JSON.parse(res.content[0].outputs.message);
-              (RAGdata.RAGreference as any[]).forEach((item) => {
-                RAGdoc.value.push(item.content as string);
-                thoughtKey.value += 1;
-              });
-            }
-            messages.value[messages.value.length - 1].status = "success";
           } catch (error) {
-            console.error(error);
+            console.error("SSE message parsing error:", error, "event:", event);
           }
-        });
+        };
 
-        socket.on("connect", () => {
-          console.log("WebSocket 连接成功");
-        });
-
-        socket.on("error", (error: any) => {
-          console.error("WebSocket 错误:", error);
-        }); */
+        eventSource.onerror = (error) => {
+          console.error("SSE 错误:", error);
+          eventSource.close();
+        };
       },
     });
 
