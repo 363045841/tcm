@@ -1,9 +1,6 @@
 <template>
   <div>
-    <img
-      :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${ID}.jpg`"
-
-      alt="中药图片"
+    <img :src="`https://www.zyysjk.xyz/api/v1/oss/get-image?filePath=zyysjk/downloaded_images/${ID}.jpg`" alt="中药图片"
       style="
         max-width: 50vh;
         margin-top: 20px;
@@ -11,50 +8,31 @@
         display: flex;
         justify-content: center;
         align-items: center;
-      "
-    />
+      " />
   </div>
   <b>相关内容</b>
-  <span
-    v-for="(item, index) in relation"
-    :key="index"
-    style="margin-left: 10px; color: rgb(16, 104, 191)"
-    @click="clickRelation(item.related_tcm_id)"
-    class="underline-on-hover"
-  >
+  <span v-for="(item, index) in relation" :key="index" style="margin-left: 10px; color: rgb(16, 104, 191)"
+    @click="clickRelation(item.related_tcm_id)" class="underline-on-hover">
     {{ item.tcmName }}
   </span>
 
   <!-- 药材详情页主要内容 -->
-  <div
-    v-for="([key, value], index) in Object.entries(propertyMap)"
-    :key="index"
-  >
+  <div v-for="([key, value], index) in Object.entries(propertyMap)" :key="index">
     <h2 v-if="index >= 1" style="line-height: 2">{{ value }}</h2>
-    <span
-      v-if="index >= 1 && computedRelationMap.get(key)?.length === 0
-      && chineseMedicineData[key as keyof typeof chineseMedicineData] !== null"
-      style="line-height: 2"
-      >{{ chineseMedicineData[key as keyof typeof chineseMedicineData] }}</span
-    >
+    <span v-if="index >= 1 && computedRelationMap.get(key)?.length === 0
+      && chineseMedicineData[key as keyof typeof chineseMedicineData] !== null" style="line-height: 2">{{
+        chineseMedicineData[key as keyof typeof chineseMedicineData] }}</span>
 
-    <span
-      v-else="index >= 1 && computedRelationMap.get(key)?.length !== 0"
-      v-for="[name, posStart, posEnd] in computedRelationMap.get(key)"
-      style="line-height: 2"
-    >
+    <span v-else="index >= 1 && computedRelationMap.get(key)?.length !== 0"
+      v-for="[name, posStart, posEnd] in computedRelationMap.get(key)" style="line-height: 2">
       <span v-if="index >= 1">{{
         chineseMedicineData[key as keyof typeof chineseMedicineData].substring(
           posStart,
           posEnd
         )
       }}</span>
-      <span
-        style="color: rgb(16, 104, 191)"
-        @click="clickRelationLinkText(name)"
-        class="underline-on-hover"
-        >{{ name }}</span
-      >
+      <span style="color: rgb(16, 104, 191)" @click="clickRelationLinkText(name)" class="underline-on-hover">{{ name
+        }}</span>
     </span>
   </div>
 </template>
@@ -131,8 +109,7 @@ const infoStore = useInfoStore();
 async function getMedicineInfo(id: number) {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_IP}:${
-        import.meta.env.VITE_BACKEND_PORT
+      `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
       }/api/v1/medinfo/page/${id}`
     );
     const data = await response.json();
@@ -156,7 +133,7 @@ async function clickRelation(id: number) {
   await getMedicineInfo(id);
   // 数据更新完成后跳转
   await router.push({ path: `/item/${id}` });
-  eventBus.emit("updateRouterViewKey");
+  eventBus.emit("updateRouterViewKey"); // PREF 可性能优化减少刷新区域
 }
 
 // 获取相关信息
@@ -213,11 +190,15 @@ onMounted(async () => {
   console.log("发送了数据");
 });
 
+onUnmounted(() => {
+  eventBus.off("clickMedNameGraph");
+});
+
 async function getMedicineRelation(id: number): Promise<RelatedInfoFinalRes[]> {
+
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_IP}:${
-        import.meta.env.VITE_BACKEND_PORT
+      `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
       }/api/v1/item-page/relation?id=${id}`
     );
     let data = await response.json();
@@ -256,10 +237,12 @@ import { useInfoStore } from "@/stores/infoPage/info";
 </script>
 <style>
 .underline-on-hover {
-  cursor: pointer; /* 鼠标悬停时显示手型 */
+  cursor: pointer;
+  /* 鼠标悬停时显示手型 */
 }
 
 .underline-on-hover:hover {
-  text-decoration: underline; /* 悬停时显示下划线 */
+  text-decoration: underline;
+  /* 悬停时显示下划线 */
 }
 </style>
