@@ -321,9 +321,7 @@ const Chat = defineComponent({
     // 消息markdown渲染逻辑
     const md = markdownit({ html: true, breaks: true });
     const renderMarkdown: BubbleProps["messageRender"] = (content) => (
-      <Typography>
         <div v-html={md.render(content)} />
-      </Typography>
     );
 
     // Suggestion 相关逻辑

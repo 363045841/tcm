@@ -1,17 +1,24 @@
 <template>
-  <v-row style="width: 90%" class="d-flex flex-nowrap">
-    <v-col cols="6" style="margin-left: 10vh">
-      <Info @updatePicUrl="handlePicUrl"></Info>
-    </v-col>
-    <v-col cols="6" style="height: 80vh">
-      <graph style="margin-top: 20px; margin-right: 20px"></graph>
-      <!-- <img
+  <v-container style="margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0;" fluid>
+    <v-row style="width: 90%" class="d-flex flex-nowrap">
+      <v-col cols="7" style="margin-left: 10vh">
+        <Info @updatePicUrl="handlePicUrl"></Info>
+      </v-col>
+      <v-col cols="5" style="height: 80vh">
+        <graph style="margin-bottom: 16px; margin-top: 32px; max-height: 60vh;"></graph>
+        <v-row justify="center">
+          <v-btn variant="outlined" prepend-icon="mdi-database-search" @click="clickDataMine">
+            数据挖掘
+          </v-btn>
+        </v-row>
+        <v-row>
+          <!-- <img
         :src="`http://www.zhongyoo.com/${picUrl}`"
         alt="中药图片"
         style="max-width: 50vh"
       /> -->
-      <etcmList :items="items"></etcmList>
-      <!-- <v-table style="width: 70%; margin: auto; margin-bottom: 40px">
+          <etcmList v-if="items.药材名" :items="items"></etcmList>
+          <!-- <v-table style="width: 70%; margin: auto; margin-bottom: 40px">
         <thead>
           <tr>
             <th class="text-left" style="width: 30%"><b>项目</b></th>
@@ -28,8 +35,10 @@
           </tr>
         </tbody>
       </v-table> -->
-    </v-col>
-  </v-row>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -39,6 +48,7 @@ import graph from "@/components/item/graph.vue";
 import { useInfoStore } from "@/stores/infoPage/info";
 import etcmList from "@/components/item/etcmList.vue";
 import { ETCMData, useGetETCMData } from "@/utils/useGetETCMdata";
+import router from "@/router";
 
 export interface RelatedInfoFinalRes {
   related_tcm_id: number;
@@ -75,16 +85,25 @@ const items = ref<ETCMData>({
 
 const infoStore = useInfoStore();
 
+function clickDataMine() {
+  console.log(infoStore.tcmName)
+  router.push({
+    path: '/datamine',
+    query: { tcmName: infoStore.tcmName }
+  });
+
+}
+
 watch(
   () => infoStore.tcmName,
   async (newVal) => {
-    console.log("发现了更新！", newVal);
+    console.log("发现了更新！", infoStore.tcmName);
     if (newVal !== "") {
       const temp = await useGetETCMData(newVal);
-      if(temp){
+      if (temp) {
         items.value = temp;
       }
-      infoStore.tcmName = "";
+      // infoStore.tcmName = "";
     }
   }
 );

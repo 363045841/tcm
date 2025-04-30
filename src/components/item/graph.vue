@@ -12,6 +12,7 @@ import { eventBus } from "@/utils/eventBus";
 import { type RelatedInfoFinalRes } from "@/pages/item/[id].vue";
 import { getMedicineRelation } from "@/utils/useGetMedicineRelation";
 import { TitleComponent } from "echarts/components";
+import { debounce } from "lodash";
 
 echarts.use([GraphChart, TooltipComponent, CanvasRenderer]);
 
@@ -40,7 +41,7 @@ onMounted(() => {
       tcmName = res as string;
       console.log("接收到药材名称：", tcmName);
       dataOptionArray.length = 0;
-      linksOptionArray.length = 0;0
+      linksOptionArray.length = 0; 0
       // 构造echarts中心
       let categoryMap = new Map<string, number>();
       categoryMap.set(tcmName, 0);
@@ -49,29 +50,43 @@ onMounted(() => {
         categoryMap.set(item.tcmName, 1);
         linksOptionArray.push({ source: tcmName, target: item.tcmName });
       }
+
       // 扩展边缘节点
       // 并发请求药材关系数据
-
       try {
         let response = await Promise.all(
           data.map((item) => getMedicineRelation(item.related_tcm_id))
         );
         let index = 0;
         let category = 2;
+
+        let countMap = new Map<string, number>();
+        response.forEach((res) => {
+          res.forEach(item => {
+            countMap.set(item.tcmName, (countMap.get(item.tcmName) || 0) + 1);
+          })
+        });
+        // console.log(countMap)
+
         for (let item of response) {
           for (let res of item) {
-            dataOptionArray.push({
-              name: res.tcmName,
-              value: 10,
-              category: category,
-            });
-            if (!categoryMap.has(res.tcmName)) {
-              categoryMap.set(res.tcmName, category);
+            const count = countMap.get(res.tcmName);
+            if ((count ?? 0) > 2) {
+              dataOptionArray.push({
+                name: res.tcmName,
+                value: 10,
+                category: category,
+              });
+              if (!categoryMap.has(res.tcmName)) {
+                categoryMap.set(res.tcmName, category);
+              }
+              // console.log(res.tcmName, count);
+              linksOptionArray.push({
+                source: data[index].tcmName,
+
+                target: res.tcmName,
+              });
             }
-            linksOptionArray.push({
-              source: data[index].tcmName,
-              target: res.tcmName,
-            });
           }
           index++;
           // category++;
@@ -81,7 +96,7 @@ onMounted(() => {
       }
 
       let dataOptionSet = new Set(dataOptionArray.map((item) => item.name));
-      if(dataOptionSet.has(tcmName)) {
+      if (dataOptionSet.has(tcmName)) {
         dataOptionSet.delete(tcmName);
       }
 
@@ -98,6 +113,9 @@ onMounted(() => {
 
         chartInstance.setOption({
           tooltip: {},
+          animation: false,
+          animationDuration: 0,
+
           title: {
             text: "词条关联", // 设置主标题文本
             subtext: "基于 zhongyoo.com 数据", // 设置副标题文本
@@ -132,8 +150,8 @@ onMounted(() => {
               force: {
                 repulsion: 500,
                 edgeLength: 20,
-                gravity: 0.4,
-                friction: 0.6,
+                gravity: 0.5,
+                friction: 0.3,
               },
               edgeSymbol: ["none", "arrow"],
               edgeLabel: {
@@ -155,6 +173,7 @@ onMounted(() => {
             },
           ],
         });
+        chartInstance.off("click")
         chartInstance.on("click", (params) => {
           handleClick(params);
         });
@@ -162,14 +181,14 @@ onMounted(() => {
           id: number;
         }
 
+
         async function handleClick(params: echarts.ECElementEvent) {
           if (params.dataType === "node") {
             console.log("点击了节点：", params.data);
 
             try {
               const response = await fetch(
-                `${import.meta.env.VITE_IP}:${
-                  import.meta.env.VITE_BACKEND_PORT
+                `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT
                 }/api/v1/medinfo/page/name/${(params.data as dataOption).name}`
               );
 

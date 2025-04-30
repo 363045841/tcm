@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSE with POST Request</title>
+</head>
+<body>
+  <h1>SSE Example</h1>
+  <button id="start-stream">Start Stream</button>
+  <pre id="output"></pre>
+
+  <script>
+    document.getElementById('start-stream').addEventListener('click', () => {
+      // 使用 POST 请求来初始化流
+      fetch('http://localhost:3001/api/v1/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: '我头昏',
+          conversation_id: 'cf9c7310-9096-4e40-b932-b1ca75b324ad'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          // 处理响应后，开始流式数据接收
+          const eventSource = new EventSource('http://localhost:3001/api/v1/chat/stream');
+          
+          eventSource.onmessage = function(event) {
+            const data = event.data;
+            document.getElementById('output').textContent += `${data}\n`;
+          };
+
+          eventSource.onerror = function(event) {
+            console.error('Error in SSE connection:', event);
+            eventSource.close();
+          };
+        } else {
+          console.error('Error starting stream');
+        }
+      })
+      .catch(error => {
+        console.error('Error in POST request:', error);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -122,8 +122,11 @@
 import { ref, watch, onMounted } from "vue";
 import { InputNumber } from "ant-design-vue";
 
+const route = useRoute();
+
 onMounted(() => {
   document.body.style.overflow = "auto";
+  herbInput.value = route.query.tcmName as string;
 });
 
 interface CountItem {
@@ -156,6 +159,8 @@ const oldNatureCountItem = ref<CountItem[]>([]);
 const isMergeTinyTasteAttribute = ref<boolean>(false);
 const oldTasteCountItem = ref<CountItem[]>([]);
 const range = ref([0, 15]);
+
+
 
 // 监控合并次级属性的开关
 watch(isMergeTinyNatureAttribute, (newValue) => {

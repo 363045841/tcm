@@ -1,56 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebSocket Test</title>
-  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <title>Stream Test</title>
 </head>
 
 <body>
-  <h1>WebSocket Test</h1>
-  <button id="connectButton">Connect WebSocket</button>
-  <p id="status">Status: Not Connected</p>
+  <h1>Stream Test</h1>
+  <div id="stream-output"></div>
 
   <script>
-    // 获取DOM元素
-    const statusElement = document.getElementById('status');
-    const connectButton = document.getElementById('connectButton');
+    async function startStream() {
+      const url = "http://localhost:3001/api/v1/chat/stream"; // 目标 URL
 
-    // 定义WebSocket连接
-    let socket;
+      const headers = {
+        Host: "www.tcmip.cn:18124",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+        Accept: "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/json;charset=UTF-8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        DNT: "1",
+        Origin: "http://www.tcmip.cn",
+        Referer: "http://www.tcmip.cn/",
+      };
 
-    // 点击按钮连接 WebSocket
-    connectButton.addEventListener('click', () => {
-      if (socket) {
-        socket.close();  // 如果已连接，先关闭之前的连接
+      const body = JSON.stringify({
+        message: "我头昏",
+        conversation_id: "cf9c7310-9096-4e40-b932-b1ca75b324ad",
+      });
+
+      try {
+        // 发送 POST 请求以初始化流式响应
+        const response = await fetch(url, {
+          method: "POST",
+          headers: headers,
+          body: body,
+        });
+
+        // 检查响应是否成功
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 处理流式响应
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let tempPkg = "";
+
+        // 异步处理数据流
+        const processStream = ({ done, value }) => {
+          if (done) {
+            console.log("Stream finished");
+            return;
+          }
+
+          // 解码当前数据块并附加到临时包
+          const chunk = decoder.decode(value, { stream: true });
+          tempPkg += chunk;
+
+          // 打印或处理当前数据块
+          console.log("Received chunk:", chunk);
+
+          // 将收到的数据追加到页面
+          const outputElement = document.getElementById('stream-output');
+          outputElement.innerHTML += `<p>${chunk}</p>`;
+
+          // 继续读取下一个数据块
+          reader.read().then(processStream);
+        };
+
+        // 初始读取流
+        reader.read().then(processStream);
+
+      } catch (error) {
+        console.error("Request failed:", error);
       }
+    }
 
-      // 连接到 WebSocket
-      socket = io('wss://139.196.234.35', {  // 使用外部已声明的 socket 变量
-        path: '/socket.io',
-        autoConnect: false,
-        transports: ['websocket'],
-      });
-
-      socket.on('connect', () => {
-        statusElement.innerText = 'Status: Connected';
-        console.log('WebSocket connected');
-      });
-
-      socket.on('connect_error', (err) => {
-        statusElement.innerText = 'Status: Connection Failed';
-        console.error('WebSocket connection error:', err);
-      });
-
-      socket.on('disconnect', () => {
-        statusElement.innerText = 'Status: Disconnected';
-        console.log('WebSocket disconnected');
-      });
-
-      socket.connect(); // 需要显式调用 connect() 来建立连接
-    });
+    // 页面加载完成后启动流式请求
+    window.onload = function () {
+      startStream();
+    };
   </script>
 </body>
 
