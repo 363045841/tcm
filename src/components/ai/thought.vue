@@ -2,7 +2,6 @@
 import { CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue';
 import { Card, Tag } from 'ant-design-vue';
 import { ThoughtChain, ThoughtChainItem, type ThoughtChainProps } from 'ant-design-x-vue';
-import { defineProps, ref, watchEffect } from 'vue';
 import { tool_tag } from './chat';
 
 // 直接声明 ragList 为 Ref 类型

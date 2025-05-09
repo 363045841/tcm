@@ -250,8 +250,8 @@ const Chat = defineComponent({
         <Welcome
           variant="borderless"
           icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-          title="你好，我是中医证型判断助手"
-          description="通过基于SD-TCM数据集建立的知识库，我能给出证型判断与分析。请告诉我你的具体症状，我会为你提供专业的解答，症状描述越详细，证型分类越准。"
+          title="你好，我是药易寻AI助手"
+          description="通过基于SD-TCM数据集建立的知识库，我能给出证型判断与分析。请告诉我你的具体症状，我会为你提供专业的解答，症状描述越详细，证型分类越准。模型全面接入药易寻MCP Server，可以将网站核心功能融入AI上下文，获得最佳效果。"
           extra={
             <Space>
               <Button icon={<ShareAltOutlined />} />
