@@ -12,6 +12,7 @@ declare module 'vue' {
     EtcmList: typeof import('./components/item/etcmList.vue')['default']
     Graph: typeof import('./components/item/graph.vue')['default']
     Info: typeof import('./components/item/info.vue')['default']
+    LoginView: typeof import('./components/login/LoginView.vue')['default']
     PieChart: typeof import('./components/mine/pieChart.vue')['default']
     RadarChart: typeof import('./components/mine/radarChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
