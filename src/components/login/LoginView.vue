@@ -94,7 +94,9 @@ const submitLogin = async () => {
   const isValid = await form.value.validate()
   if (isValid.valid) {
     try {
-      const response = await fetch('http://www.zyysjk.xyz/api/v1/auth/login', {
+      const response = await fetch(
+        `${import.meta.env.VITE_IP}:${import.meta.env.VITE_BACKEND_PORT}/api/v1/auth/login`,
+        {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

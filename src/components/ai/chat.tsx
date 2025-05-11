@@ -38,6 +38,7 @@ import { Badge, Button, Space, Tag, theme, Typography } from "ant-design-vue";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
 import markdownit from "markdown-it";
+import './Chat.css';
 
 interface Outputs {
   references: any[];
@@ -321,7 +322,9 @@ const Chat = defineComponent({
     // 消息markdown渲染逻辑
     const md = markdownit({ html: true, breaks: true });
     const renderMarkdown: BubbleProps["messageRender"] = (content) => (
+      <Typography >
         <div v-html={md.render(content)} />
+      </Typography>
     );
 
     // Suggestion 相关逻辑
@@ -463,7 +466,7 @@ const Chat = defineComponent({
         key: id,
         loading: status === "loading",
         role: status === "local" ? "local" : "ai",
-        messageRender: renderMarkdown,
+        messageRender: status === "local" ? undefined : renderMarkdown, // 只有 ai 才用 renderMarkdown
         content: message,
       }))
     );
