@@ -1,12 +1,20 @@
 <script setup lang="tsx">
-import { CheckCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons-vue';
+import { CheckCircleOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons-vue';
 import { Card, Tag } from 'ant-design-vue';
-import { ThoughtChain, ThoughtChainItem, type ThoughtChainProps } from 'ant-design-x-vue';
+import { ThoughtChain } from 'ant-design-x-vue';
 import { tool_tag } from './chat';
+
+
+type ThinkItemType = 'thought' | 'tool_call';
+
+export interface ThinkItem {
+  type: ThinkItemType;
+  content: string;
+}
 
 // 直接声明 ragList 为 Ref 类型
 let props = defineProps<{
-  ragList: string[];  // ragList 直接作为一个数组类型传入
+  ThinkList: string[];  // ragList 直接作为一个数组类型传入
   isComplete: boolean;
   usingTools: tool_tag[];
 }>();
@@ -20,77 +28,86 @@ const componentKey = ref(0);
   console.log('raglist..', isComplete); // 直接访问
 }); */
 
-function getStatusIcon(status: ThoughtChainItem['status']) {
-  switch (status) {
+function getStatusIcon(type: 'thought' | 'tool_call' | 'success' | 'pending' | 'processing') {
+  switch (type) {
+    case 'thought':
+      return <CheckCircleOutlined />;
+    case 'tool_call':
+      return <SettingOutlined />; // 工具调用专用图标
     case 'success':
       return <CheckCircleOutlined />;
-    case 'error':
-      return <InfoCircleOutlined />;
     case 'pending':
       return <LoadingOutlined />;
+    case 'processing':
+      return <SettingOutlined />;
     default:
       return undefined;
   }
 }
 
+// 监视 thinkList 的变化
+watch(() => props.ThinkList, (val) => {
+  console.log('thinkList updated', val);
+}, { deep: true });
+
 // 更新 items 以包含 ragList
-const items = computed<ThoughtChainProps['items']>(() => [
-  ...(props.usingTools.length > 0
-    ? [{
-      title: '使用工具',
-      status: 'success',
-      description: (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {props.usingTools.map((tool: tool_tag) => (
-            <Tag
-              key={tool.tool_id}
-              style={{
-                background: "#f5f7ff",
-                color: "#3a5cff",
-                border: "none",
-                fontSize: "14px",
-                fontWeight: "500",
-                borderRadius: "16px",
-                padding: "6px 12px",
-                margin: "10px 0 0 0"
-              }}
-            >
-              @{tool.tool_name}
-            </Tag>
-          ))}
-        </div>
-      ),
-      icon: getStatusIcon('success'),
-    } as ThoughtChainItem]
+const items = computed(() => {
+  const toolItems = props.usingTools.length > 0
+    ? [
+      {
+        title: '使用工具',
+        status: 'success' as const,
+        description: (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {props.usingTools.map((tool: tool_tag) => (
+              <Tag
+                key={tool.tool_id}
+                style={{
+                  background: '#f5f7ff',
+                  color: '#3a5cff',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  borderRadius: '16px',
+                  padding: '6px 12px',
+                  margin: '10px 0 0 0',
+                }}
+              >
+                @{tool.tool_name}
+              </Tag>
+            ))}
+          </div>
+        ),
+        icon: getStatusIcon('success'),
+      },
+    ]
+    : [];
 
-    : []),
-  {
-    title: '检索知识库',
-    status: 'success',
-    description: `召回了 ${props.ragList.length} 条相关切片`,
-    icon: getStatusIcon('success'),
-    content: props.ragList.length > 0
-      ? (
-        <div style={{ height: '40vh', maxHeight: '40vh', overflowY: 'auto' }}>
-          {props.ragList.map((item, index) => (
-            <div key={index}>
-              <span style={{ fontWeight: 'bold' }}>{index + 1}. </span>
-              <p style={{ display: 'inline' }}>{item}</p>
-              <br />
-            </div>
-          ))}
-        </div>
-      )
-      : undefined,
-  },
+  const thinkItems = props.ThinkList.map(item => ({
+    title: item.type === 'thought' ? '思考过程' : 'MCP 工具调用',
+    status: item.type === 'thought' ? ('success' as const) : ('processing' as const),
+    description: (
+      <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+        {item.content}
+      </div>
+    ),
+    icon: getStatusIcon(item.type), // 使用 type 来决定图标
+    style:
+      item.type === 'tool_call'
+        ? { backgroundColor: '#f5f7ff', borderLeft: '4px solid #3a5cff' }
+        : {},
+  }));
 
-  {
+  const summaryItem = {
     title: props.isComplete ? '总结完毕' : '模型总结中',
     status: props.isComplete ? 'success' : 'pending',
-    description: props.isComplete ? ' ' : '正在生成摘要...',
-    icon: props.isComplete ? getStatusIcon('success') : getStatusIcon('pending'),
-  },
-]);
+    description: props.isComplete ? '' : '正在生成摘要...',
+    icon: getStatusIcon(props.isComplete ? 'success' : 'pending'),
+  };
+
+  return [...toolItems, ...thinkItems, summaryItem];
+});
+
 
 /* console.log('com',isComplete)
 

@@ -38,7 +38,8 @@ import { Badge, Button, Space, Tag, theme, Typography } from "ant-design-vue";
 import { eventBus } from "@/utils/eventBus";
 import Thought from "./thought.vue";
 import markdownit from "markdown-it";
-import './Chat.css';
+import "./Chat.css";
+import { ThinkItem } from "./thought.vue";
 
 interface Outputs {
   references: any[];
@@ -79,7 +80,7 @@ const Chat = defineComponent({
     const conversationsItems = ref([{ key: "0", label: "新对话" }]); // 左侧对话列表
     const activeKey = ref("0");
     const attachedFiles = ref<AttachmentsProps["items"]>([]);
-    const RAGdoc = ref<string[]>([]);
+    const ThinkDoc = ref<ThinkItem[]>([]);
     let usingTools = ref<tool_tag[]>([]);
 
     // 样式管理
@@ -87,8 +88,7 @@ const Chat = defineComponent({
     const styles = computed(() => ({
       layout: {
         width: "100%",
-        "min-width": "1000px",
-        height: "100%",
+        height: "100vh",
         "border-radius": `${token.value.borderRadius}px`,
         display: "flex",
         background: `${token.value.colorBgContainer}`,
@@ -116,9 +116,19 @@ const Chat = defineComponent({
         "flex-direction": "column",
         padding: `${token.value.paddingLG}px`,
         gap: "16px",
+        overflow: "hidden", // 👈 关键！阻止内容撑开全局滚动
       },
       messages: {
         flex: 1,
+        overflowY: "auto",
+        minHeight: 0,
+        "-webkit-overflow-scrolling": "touch", // 移动端优化
+        msOverflowStyle: "none", // IE/Edge
+        scrollbarWidth: "none", // Firefox
+        "&::-webkit-scrollbar": {
+          // Chrome/Safari/Edge
+          display: "none",
+        },
       },
       placeholder: {
         "padding-top": "32px",
@@ -218,7 +228,7 @@ const Chat = defineComponent({
         header: (
           <Thought
             isComplete={!agentRequestLoading.value}
-            ragList={RAGdoc.value}
+            ThinkList={ThinkDoc.value}
             usingTools={usingTools.value}
           />
         ),
@@ -322,7 +332,7 @@ const Chat = defineComponent({
     // 消息markdown渲染逻辑
     const md = markdownit({ html: true, breaks: true });
     const renderMarkdown: BubbleProps["messageRender"] = (content) => (
-      <Typography >
+      <Typography>
         <div v-html={md.render(content)} />
       </Typography>
     );
@@ -419,15 +429,68 @@ const Chat = defineComponent({
             if ("message" in SSEchunk) {
               let res: ResponseData = JSON.parse(SSEchunk.message);
               messages.value[messages.value.length - 1].message += res.answer;
+              let content = res.content[0];
+              if ("event_type" in content && content.event_type === "thought") {
+                const text = content.outputs.text || "";
 
-              if (
-                "message_type" in res.content[0].outputs &&
-                res.content[0].outputs.message_type === "json"
+                if (
+                  ThinkDoc.value.length === 0 ||
+                  ThinkDoc.value[ThinkDoc.value.length - 1].type !== "thought"
+                ) {
+                  // 如果是第一个项 或 上一个不是思考项，则新建一个
+                  ThinkDoc.value = [
+                    ...ThinkDoc.value,
+                    {
+                      type: "thought",
+                      content: text,
+                    },
+                  ];
+                } else {
+                  // 否则就在最后一个思考项后面追加内容
+                  const lastIndex = ThinkDoc.value.length - 1;
+                  ThinkDoc.value = [
+                    ...ThinkDoc.value.slice(0, lastIndex),
+                    {
+                      ...ThinkDoc.value[lastIndex],
+                      content: ThinkDoc.value[lastIndex].content + text,
+                    },
+                  ];
+                }
+              } else if (
+                "event_type" in content &&
+                content.event_type === "function_call"
               ) {
-                const RAGdata = JSON.parse(res.content[0].outputs.message);
-                (RAGdata.RAGreference as any[]).forEach((item) => {
-                  RAGdoc.value.push(item.content as string);
-                });
+                const toolCallData = content.outputs.text;
+
+                // 不再显示参数
+                const description = `调用了 ${toolCallData.component_name}（${toolCallData.component_code}）`;
+
+                // 判断是否需要追加到上一个 tool_call
+                if (
+                  ThinkDoc.value.length > 0 &&
+                  ThinkDoc.value[ThinkDoc.value.length - 1].type === "tool_call"
+                ) {
+                  const lastIndex = ThinkDoc.value.length - 1;
+                  ThinkDoc.value = [
+                    ...ThinkDoc.value.slice(0, lastIndex),
+                    {
+                      ...ThinkDoc.value[lastIndex],
+                      content:
+                        ThinkDoc.value[lastIndex].content +
+                        "\n\n" +
+                        description,
+                    },
+                  ];
+                } else {
+                  // 新建一个 tool_call 项
+                  ThinkDoc.value = [
+                    ...ThinkDoc.value,
+                    {
+                      type: "tool_call",
+                      content: description,
+                    },
+                  ];
+                }
               }
 
               messages.value[messages.value.length - 1].status = "success";
