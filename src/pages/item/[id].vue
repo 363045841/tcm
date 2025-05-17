@@ -2,11 +2,14 @@
   <v-container style="margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0;" fluid>
     <v-row style="width: 90%" class="d-flex flex-nowrap">
       <v-col cols="7" style="margin-left: 10vh">
-        <Info @updatePicUrl="handlePicUrl"></Info>
+        <Info @updatePicUrl="handlePicUrl" @update:is-edit-mode="handleUpdateEditMode" :is-edit-mode="isEditMode"></Info>
       </v-col>
       <v-col cols="5" style="height: 80vh">
         <graph style="margin-bottom: 16px; margin-top: 32px; max-height: 60vh;"></graph>
-        <v-row justify="center">
+        <v-row justify="center" style="gap: 16px;">
+          <v-btn variant="outlined" prepend-icon="mdi-pencil" @click="isEditMode = !isEditMode">
+            编辑词条
+          </v-btn>
           <v-btn variant="outlined" prepend-icon="mdi-database-search" @click="clickDataMine">
             数据挖掘
           </v-btn>
@@ -56,6 +59,7 @@ export interface RelatedInfoFinalRes {
 }
 
 const picUrl = ref("");
+let isEditMode = ref(false);
 
 const items = ref<ETCMData>({
   药材名: "",
@@ -91,7 +95,10 @@ function clickDataMine() {
     path: '/datamine',
     query: { tcmName: infoStore.tcmName }
   });
+}
 
+function handleUpdateEditMode(value: boolean) {
+  isEditMode.value = value;
 }
 
 watch(
